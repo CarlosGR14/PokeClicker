@@ -1,4 +1,34 @@
 :root {
+  /* Primary Colors */
+  --color-primary: oklch(52% 0.18 15); /* Pokémon Red */
+  --color-secondary: oklch(60% 0.16 250); /* Electric Blue */
+  --color-accent: oklch(75% 0.15 85); /* Pokémon Yellow */
+
+  /* Interface Colors */
+  --bg-app: oklch(98% 0.01 200); /* Very Light Gray */
+  --bg-card: #ffffff;
+  --text-main: oklch(30% 0.02 200); /* Dark Gray */
+  --text-muted: oklch(50% 0.02 200); /* Medium Gray */
+
+  /* State Colors */
+  --color-success: oklch(60% 0.15 140); /* Green */
+  --color-disabled: oklch(70% 0.02 200); /* Light Gray */
+  --color-error: oklch(50% 0.18 25); /* Red */
+
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+  /* Typography */
+  --font-main:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", "Courier New", monospace;
+}
+
+:root {
   --background: #ffffff;
   --foreground: #171717;
 }

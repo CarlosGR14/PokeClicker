@@ -39,3 +39,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# copilot skills & prompts
+.agents/
+*.prompt.md
+*.instructions.md
+skills-lock.json
+POKEAPI_INTEGRATION.md
+PRODUCT.md
+DESIGN.md
+.github

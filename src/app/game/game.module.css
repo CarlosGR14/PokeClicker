@@ -1,0 +1,1333 @@
+/* ====================
+   Game Container
+   ==================== */
+.gameContainer {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--bg-app);
+}
+
+/* ====================
+   Header
+   ==================== */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  background-color: var(--bg-card);
+  border-bottom: 2px solid var(--color-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.headerLeft {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-md);
+}
+
+.playerName {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.level {
+  font-size: 0.875rem;
+  background-color: var(--color-accent);
+  color: var(--text-main);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.headerCenter {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.currencyBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.currencyLabel {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.money {
+  font-size: 2rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--color-accent);
+  display: flex;
+  gap: 0.25rem;
+}
+
+.moneyInteger {
+  font-size: 2.25rem;
+}
+
+.moneyDecimal {
+  font-size: 1.25rem;
+  opacity: 0.7;
+}
+
+.headerRight {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.headerBtn {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: none;
+  background-color: var(--bg-app);
+  border-radius: 8px;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.headerBtn:hover {
+  background-color: var(--color-primary);
+  transform: scale(1.05);
+}
+
+/* ====================
+   Main Layout
+   ==================== */
+.mainLayout {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: var(--spacing-xl);
+  padding: var(--spacing-lg) var(--spacing-xl);
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  align-items: start;
+}
+
+/* ====================
+   Game Center
+   ==================== */
+.gameCenter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--spacing-lg);
+  min-height: auto;
+}
+
+.clickerSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  width: 100%;
+}
+
+/* Per Click Container - Above Pokéball */
+.perClickContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: 1rem;
+  min-height: 40px;
+  justify-content: center;
+}
+
+.perClickLabel {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.perClickValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--color-accent);
+}
+
+.pokemonCircle {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-secondary)
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  box-shadow: 0 10px 30px rgba(238, 21, 21, 0.3);
+  transition: all 0.1s ease;
+  position: relative;
+}
+
+.pokemonCircle:hover {
+  transform: scale(1.02);
+  box-shadow: 0 15px 40px rgba(238, 21, 21, 0.4);
+}
+
+.pokemonCircle:active {
+  transform: scale(0.95);
+  box-shadow: 0 5px 15px rgba(238, 21, 21, 0.2);
+}
+
+.pokemonEmoji {
+  font-size: 5rem;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.clickEffect {
+  position: absolute;
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--color-accent);
+  pointer-events: none;
+  animation: floatUp 0.5s ease-out forwards;
+  font-family: var(--font-mono);
+}
+
+@keyframes floatUp {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+}
+
+/* Multiplicador Container - Below Pokéball */
+.multiplierContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: 1rem;
+  min-height: 40px;
+  justify-content: center;
+}
+
+.multiplierLabel {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.multiplierValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--color-secondary);
+}
+
+/* ====================
+   Showcase Section
+   ==================== */
+.showcaseSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.showcase {
+  background-color: var(--bg-card);
+  border: 2px dashed var(--color-accent);
+  border-radius: 12px;
+  padding: var(--spacing-lg);
+  text-align: center;
+  width: 100%;
+  max-width: 280px;
+}
+
+/* ====================
+   Expositor Section
+   ==================== */
+.expositorSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.expositorTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.displaySlots {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-md);
+  width: 100%;
+  max-width: 320px;
+}
+
+.displaySlot {
+  width: 70px;
+  height: 70px;
+  border: 2px solid #e1e8ed;
+  border-radius: 8px;
+  background-color: var(--bg-app);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  overflow: hidden;
+}
+
+.displaySlot:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: var(--color-primary);
+}
+
+.displaySlotEmpty {
+  border-style: dashed;
+  border-color: var(--color-accent);
+  background-color: rgba(255, 203, 5, 0.05);
+}
+
+.displaySlotEmpty:hover {
+  border-color: var(--color-primary);
+  background-color: rgba(238, 21, 21, 0.05);
+}
+
+.displaySlotFilled {
+  border-color: var(--color-primary);
+  background-color: var(--bg-card);
+}
+
+.displaySlotPlaceholder {
+  font-size: 1.5rem;
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+.displaySlotImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: var(--spacing-xs);
+}
+
+.showcaseFrame {
+  font-size: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 120px;
+}
+
+.showcaseEmoji {
+  animation: bounce 0.6s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.pokedexBtn {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--color-secondary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.pokedexBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(42, 117, 187, 0.3);
+}
+
+/* ====================
+   Pokédex Grid
+   ==================== */
+.pokedexGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: var(--spacing-md);
+  width: 100%;
+  padding: var(--spacing-md);
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.pokedexCard {
+  background-color: var(--bg-app);
+  border: 2px solid #e1e8ed;
+  border-radius: 8px;
+  padding: var(--spacing-md);
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  overflow: hidden;
+}
+
+.pokedexCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.rarity_common {
+  border-color: #a0aec0;
+  background: linear-gradient(135deg, #edf2f7 0%, #f7fafc 100%);
+}
+
+.rarity_rare {
+  border-color: #48bb78;
+  background: linear-gradient(135deg, #f0fff4 0%, #e6fffa 100%);
+}
+
+.rarity_epic {
+  border-color: #9f7aea;
+  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+}
+
+.rarity_legendary {
+  border-color: #ecc94b;
+  background: linear-gradient(135deg, #fffff0 0%, #fffacd 100%);
+  box-shadow: 0 0 20px rgba(236, 201, 75, 0.3);
+}
+
+.pokedexImage {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.pokedexName {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-main);
+  word-break: break-word;
+}
+
+.pokedexRarity {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: capitalize;
+  font-weight: 600;
+}
+
+.pokemonImage {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* ====================
+   Mobile Responsive
+   ==================== */
+@media (max-width: 1024px) {
+  .mainLayout {
+    grid-template-columns: 1fr;
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+  .shopSidebar {
+    display: none !important;
+  }
+  .openShopMobileBtn {
+    display: flex !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .header {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+  }
+
+  .headerLeft,
+  .headerCenter,
+  .headerRight {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .playerName {
+    font-size: 1.25rem;
+  }
+
+  .money {
+    font-size: 1.75rem;
+  }
+
+  .moneyInteger {
+    font-size: 1.75rem;
+  }
+
+  .moneyDecimal {
+    font-size: 1rem;
+  }
+
+  .pokemonCircle {
+    width: 160px;
+    height: 160px;
+  }
+
+  .pokemonEmoji {
+    font-size: 3rem;
+  }
+
+  .perClickValue,
+  .multiplierValue {
+    font-size: 1.1rem;
+  }
+
+  .mainLayout {
+    padding: var(--spacing-md);
+    gap: var(--spacing-sm);
+  }
+
+  .headerBtn {
+    width: 2rem;
+    height: 2rem;
+    font-size: 1rem;
+  }
+
+  .pokedexGrid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    max-height: 300px;
+  }
+
+  .displaySlots {
+    max-width: 280px;
+  }
+
+  .displaySlot {
+    width: 60px;
+    height: 60px;
+  }
+
+  .perClickValue,
+  .multiplierValue {
+    font-size: 1.25rem;
+  }
+
+  .pokedexModal {
+    width: 95%;
+    max-height: 85vh;
+  }
+
+  .pokedexModalHeader {
+    padding: var(--spacing-md);
+  }
+
+  .pokedexModalTitle {
+    font-size: 1.25rem;
+  }
+
+  .pokedexModalContent {
+    padding: var(--spacing-md);
+  }
+
+  .pokedexModalGrid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: var(--spacing-sm);
+  }
+}
+
+/* ====================
+   Shop Sidebar (Desktop)
+   ==================== */
+.shopSidebar {
+  position: sticky;
+  top: var(--spacing-lg);
+  background: oklch(99% 0.003 20);
+  border: 1px solid oklch(90% 0.008 20);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 4px 20px oklch(0% 0 0 / 0.06);
+  max-height: calc(100vh - 120px);
+}
+
+.shopHeader {
+  padding: var(--spacing-md) var(--spacing-lg) var(--spacing-sm);
+  border-bottom: 1px solid oklch(91% 0.007 20);
+  background: white;
+  flex-shrink: 0;
+}
+
+.shopTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0 0 var(--spacing-sm);
+  letter-spacing: -0.01em;
+}
+
+.shopTabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px;
+  background: oklch(94% 0.006 20);
+  border-radius: 10px;
+  padding: 3px;
+}
+
+.shopTab {
+  padding: 7px var(--spacing-sm);
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  font-family: var(--font-main);
+}
+
+.shopTab:hover {
+  color: var(--text-main);
+  background: oklch(91% 0.007 20);
+}
+
+.shopTabActive {
+  background: white;
+  color: var(--color-primary);
+  box-shadow: 0 1px 5px oklch(0% 0 0 / 0.12);
+}
+
+.shopContent {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-md);
+  scrollbar-width: thin;
+  scrollbar-color: oklch(85% 0.01 20) transparent;
+}
+
+/* ====================
+   Upgrade Cards
+   ==================== */
+.upgradesList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.upgradeCard {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 10px 12px;
+  background: white;
+  border: 1px solid oklch(91% 0.007 20);
+  border-radius: 12px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: default;
+}
+
+.upgradeCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px oklch(0% 0 0 / 0.08);
+  border-color: oklch(65% 0.12 15);
+}
+
+.upgradeCardDisabled {
+  opacity: 0.45;
+}
+
+.upgradeCardDisabled:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: oklch(91% 0.007 20);
+}
+
+.upgradeIconBubble {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: oklch(96% 0.01 20);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.upgradeInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.upgradeName {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.upgradeDesc {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.upgradeRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.upgradeCount {
+  font-size: 0.65rem;
+  font-weight: 800;
+  background: oklch(75% 0.15 85);
+  color: oklch(22% 0.01 20);
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+}
+
+.upgradeBuyBtn {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 5px 10px;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  min-height: 30px;
+}
+
+.upgradeBuyBtn:hover:not(:disabled) {
+  background: oklch(58% 0.18 15);
+  transform: scale(1.04);
+}
+
+.upgradeBuyBtn:disabled {
+  background: oklch(80% 0.01 20);
+  cursor: not-allowed;
+  color: oklch(55% 0.01 20);
+}
+
+.upgradeBuyIcon {
+  font-size: 0.65rem;
+}
+
+/* ====================
+   Pack Cards
+   ==================== */
+.packsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.packCard {
+  border-radius: 14px;
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  border: 2px solid transparent;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.packCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px oklch(0% 0 0 / 0.12);
+}
+
+.packCard_basic {
+  background: linear-gradient(
+    140deg,
+    oklch(97% 0.018 145) 0%,
+    oklch(95% 0.012 165) 100%
+  );
+  border-color: oklch(76% 0.1 145);
+}
+
+.packCard_epic {
+  background: linear-gradient(
+    140deg,
+    oklch(97% 0.02 295) 0%,
+    oklch(95% 0.028 305) 100%
+  );
+  border-color: oklch(66% 0.16 295);
+}
+
+.packIconWrap {
+  display: flex;
+  justify-content: center;
+  padding: 4px 0;
+}
+
+.packIcon {
+  font-size: 2.8rem;
+  display: inline-block;
+  filter: drop-shadow(0 4px 8px oklch(0% 0 0 / 0.15));
+}
+
+.packIconShaking {
+  animation: packShake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+@keyframes packShake {
+  0%,
+  100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  15% {
+    transform: translateX(-7px) rotate(-9deg);
+  }
+  30% {
+    transform: translateX(7px) rotate(9deg);
+  }
+  45% {
+    transform: translateX(-5px) rotate(-6deg);
+  }
+  60% {
+    transform: translateX(5px) rotate(6deg);
+  }
+  75% {
+    transform: translateX(-2px) rotate(-2deg);
+  }
+  90% {
+    transform: translateX(2px) rotate(2deg);
+  }
+}
+
+.packName {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-main);
+  text-align: center;
+  letter-spacing: -0.01em;
+}
+
+.packRarities {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rarityPill {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.rarityCommonPill {
+  background: oklch(93% 0.005 200);
+  color: oklch(38% 0.01 200);
+}
+
+.rarityRarePill {
+  background: oklch(93% 0.04 145);
+  color: oklch(33% 0.1 145);
+}
+
+.rarityEpicPill {
+  background: oklch(93% 0.04 295);
+  color: oklch(32% 0.12 295);
+}
+
+.rarityLegendaryPill {
+  background: oklch(95% 0.07 85);
+  color: oklch(33% 0.1 70);
+}
+
+.packBuyBtn {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--color-primary);
+  color: white;
+  font-family: var(--font-mono);
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.packBuyBtn:hover:not(:disabled) {
+  background: oklch(58% 0.18 15);
+  transform: scale(1.01);
+  box-shadow: 0 4px 14px oklch(52% 0.18 15 / 0.35);
+}
+
+.packBuyBtnDisabled {
+  background: oklch(80% 0.01 20) !important;
+  cursor: not-allowed;
+  color: oklch(55% 0.01 20);
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.packOpening {
+  opacity: 0.75;
+  animation: pulse 0.7s ease-in-out infinite;
+}
+
+/* ====================
+   Mobile Open Shop Button
+   ==================== */
+.openShopMobileBtn {
+  display: none;
+  padding: 12px 28px;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 16px oklch(52% 0.18 15 / 0.3);
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+  font-family: var(--font-main);
+}
+
+.openShopMobileBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px oklch(52% 0.18 15 / 0.42);
+}
+
+.openShopMobileBtn:active {
+  transform: scale(0.97);
+}
+
+/* ====================
+   Mobile Shop Drawer
+   ==================== */
+.drawerBackdrop {
+  position: fixed;
+  inset: 0;
+  background: oklch(0% 0 0 / 0.52);
+  z-index: 300;
+  animation: fadeIn 0.2s ease;
+}
+
+.shopDrawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 20px 20px 0 0;
+  z-index: 301;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  animation: slideUpDrawer 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 -10px 50px oklch(0% 0 0 / 0.22);
+}
+
+@keyframes slideUpDrawer {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.drawerTop {
+  padding: var(--spacing-sm) var(--spacing-lg) 0;
+  flex-shrink: 0;
+  border-bottom: 1px solid oklch(92% 0.007 20);
+}
+
+.drawerHandle {
+  width: 40px;
+  height: 4px;
+  background: oklch(84% 0.01 20);
+  border-radius: 2px;
+  margin: 0 auto var(--spacing-sm);
+}
+
+.drawerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-sm);
+}
+
+.drawerClose {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: oklch(94% 0.007 20);
+  border-radius: 50%;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-main);
+}
+
+.drawerClose:hover {
+  background: var(--color-primary);
+  color: white;
+  transform: rotate(90deg);
+}
+
+/* ====================
+   Capture Reveal Modal
+   ==================== */
+.captureRevealBackdrop {
+  position: fixed;
+  inset: 0;
+  background: oklch(0% 0 0 / 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 400;
+  animation: fadeIn 0.18s ease;
+}
+
+.captureRevealCard {
+  background: white;
+  border-radius: 22px;
+  padding: var(--spacing-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  min-width: 260px;
+  max-width: 320px;
+  animation: popIn 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
+  text-align: center;
+}
+
+@keyframes popIn {
+  from {
+    transform: scale(0.45);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.captureReveal_common {
+  border: 3px solid oklch(74% 0.01 200);
+  box-shadow: 0 0 30px oklch(0% 0 0 / 0.14);
+}
+
+.captureReveal_rare {
+  border: 3px solid oklch(65% 0.12 145);
+  box-shadow: 0 0 36px oklch(65% 0.12 145 / 0.32);
+}
+
+.captureReveal_epic {
+  border: 3px solid oklch(65% 0.16 295);
+  box-shadow: 0 0 44px oklch(65% 0.16 295 / 0.42);
+}
+
+.captureReveal_legendary {
+  border: 3px solid oklch(75% 0.15 85);
+  box-shadow: 0 0 60px oklch(75% 0.15 85 / 0.52);
+  background: linear-gradient(140deg, oklch(99% 0.01 85) 0%, white 60%);
+}
+
+.captureRevealBadge {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 4px 14px;
+  border-radius: 20px;
+  background: oklch(95% 0.01 20);
+  color: var(--text-main);
+  font-family: var(--font-main);
+}
+
+.captureRevealImage {
+  width: 130px;
+  height: 130px;
+  object-fit: contain;
+  animation: float 2.2s ease-in-out infinite;
+  image-rendering: pixelated;
+}
+
+.captureRevealName {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-main);
+  text-transform: capitalize;
+  letter-spacing: -0.01em;
+}
+
+.captureRevealClose {
+  padding: 11px 36px;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 11px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+  font-family: var(--font-main);
+}
+
+.captureRevealClose:hover {
+  background: oklch(58% 0.18 15);
+  transform: scale(1.02);
+}
+
+/* ====================
+   Pokédex Modal
+   ==================== */
+.pokedexBackdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.pokedexModal {
+  background-color: var(--bg-card);
+  border: 2px solid var(--color-primary);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 700px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.pokedexModalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-lg);
+  border-bottom: 2px solid #e1e8ed;
+}
+
+.pokedexModalTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin: 0;
+}
+
+.pokedexModalClose {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: none;
+  background-color: #f5f5f5;
+  border-radius: 50%;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-main);
+}
+
+.pokedexModalClose:hover {
+  background-color: var(--color-primary);
+  color: white;
+  transform: rotate(90deg);
+}
+
+.pokedexModalContent {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-lg);
+}
+
+.pokedexModalGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: var(--spacing-md);
+  width: 100%;
+}
+
+.pokedexEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  gap: var(--spacing-lg);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.pokedexEmptyEmoji {
+  font-size: 3rem;
+  animation: bounce 0.6s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Scrollbar para modal content */
+.pokedexModalContent::-webkit-scrollbar {
+  width: 8px;
+}
+
+.pokedexModalContent::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.pokedexModalContent::-webkit-scrollbar-thumb {
+  background: var(--color-accent);
+  border-radius: 4px;
+}
+
+.pokedexModalContent::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
+}
+
+/* ====================
+   Scrollbar Styling
+   ==================== */
+.shop::-webkit-scrollbar {
+  width: 8px;
+}
+
+.shop::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.shop::-webkit-scrollbar-thumb {
+  background: var(--color-accent);
+  border-radius: 4px;
+}
+
+.shop::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
+}
