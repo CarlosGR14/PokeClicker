@@ -14,10 +14,20 @@ model Usuario {
   email           String    @unique
   nombre          String
   password        String
+  
+  // Stats del juego
   monedas         Int       @default(0)
+  clicks          BigInt    @default(0)           // Total histórico de clicks
+  cps             Float     @default(0)           // Clicks por segundo (ingreso pasivo)
   multiplicador   Float     @default(1.0)
+  
+  // Preferencias
+  tema            String    @default("system")    // light, dark, o system
+  
+  // Metadata
   role            String    @default("jugador")
   fecha_creacion  DateTime  @default(now())
+  ultima_actualizacion DateTime @default(now()) @updatedAt
   
   // Relaciones
   pokemons        Pokemon[]
@@ -33,6 +43,7 @@ model Pokemon {
   pokeapi_id      Int
   fecha_captura   DateTime  @default(now())
   expuesto        Boolean   @default(false)
+  indiceSlot      Int?                            // 0-3 si está en expositor, null si no
 
   @@map("pokemon")
 }
@@ -42,8 +53,10 @@ model Mejora {
   usuario_id            Int
   usuario               Usuario   @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
   nombre_item           String
+  cantidad              Int       @default(0)     // Cuántas de este upgrade compró
   precio_actual         Int
   valor_multiplicador   Float
+  click_bonus           Float     @default(0)     // Bonificación de daño por click
 
   @@map("mejora")
 }

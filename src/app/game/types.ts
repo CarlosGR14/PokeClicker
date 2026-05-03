@@ -1,9 +1,6 @@
 export interface GameState {
   money: number;
   clicks: number;
-  pokemonName: string;
-  pokemonImage: string;
-  level: number;
   cps: number;
   upgrades: Upgrade[];
   collectedPokemon: CollectedPokemon[];
@@ -15,6 +12,7 @@ export interface Upgrade {
   cost: number;
   count: number;
   cpsBonus: number;
+  clickBonus?: number;
   description: string;
 }
 
@@ -23,6 +21,8 @@ export interface CollectedPokemon {
   name: string;
   image: string;
   rarity: "common" | "rare" | "epic" | "legendary";
+  indiceSlot?: number | null; // 0-3 if displayed, null otherwise
+  expuesto?: boolean; // Whether pokemon is displayed in expositor
 }
 
 export interface Pack {
@@ -70,6 +70,33 @@ export const INITIAL_UPGRADES: Upgrade[] = [
     count: 0,
     cpsBonus: 100,
     description: "+100 por segundo",
+  },
+  {
+    id: "powerglove",
+    name: "Power Glove",
+    cost: 50,
+    count: 0,
+    cpsBonus: 0,
+    clickBonus: 1,
+    description: "+1 por clic",
+  },
+  {
+    id: "strengthband",
+    name: "Strength Band",
+    cost: 500,
+    count: 0,
+    cpsBonus: 0,
+    clickBonus: 5,
+    description: "+5 por clic",
+  },
+  {
+    id: "lifeorb",
+    name: "Life Orb",
+    cost: 5000,
+    count: 0,
+    cpsBonus: 0,
+    clickBonus: 25,
+    description: "+25 por clic",
   },
 ];
 
@@ -137,4 +164,13 @@ export function pickPokemonId(rarity: CollectedPokemon["rarity"]): number {
 
 export function makeCaptureId(pokemonId: number): string {
   return `${pokemonId}_${Date.now()}`;
+}
+
+export function getRarityByPokemonId(
+  pokemonId: number,
+): CollectedPokemon["rarity"] {
+  if (LEGENDARY_IDS.includes(pokemonId)) return "legendary";
+  if (EPIC_IDS.includes(pokemonId)) return "epic";
+  if (pokemonId > 151) return "rare"; // Gen II and beyond
+  return "common";
 }

@@ -8,30 +8,32 @@ interface ClickEffect {
 }
 
 interface Props {
-  cps: number;
+  cps: number | undefined;
+  clickBonus: number;
   clickEffect: ClickEffect | null;
-  onPokeballClick: (e: React.MouseEvent<HTMLDivElement>) => void;
+  onPokeballClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 export default function ClickerSection({
   cps,
+  clickBonus,
   clickEffect,
   onPokeballClick,
 }: Props) {
+  const totalClickDamage = 1 + clickBonus;
   const [isWiggling, setIsWiggling] = useState(false);
 
-  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     setIsWiggling(true);
-    const timer = setTimeout(() => setIsWiggling(false), 500);
+    setTimeout(() => setIsWiggling(false), 500);
     onPokeballClick(e);
-    return () => clearTimeout(timer);
   };
 
   return (
     <div className={styles.clickerSection}>
       <div className={styles.perClickContainer}>
         <span className={styles.perClickLabel}>Por clic:</span>
-        <span className={styles.perClickValue}>+1</span>
+        <span className={styles.perClickValue}>+{totalClickDamage}</span>
       </div>
 
       <button
@@ -52,14 +54,14 @@ export default function ClickerSection({
             className={styles.clickEffect}
             style={{ left: `${clickEffect.x}px`, top: `${clickEffect.y}px` }}
           >
-            +1
+            +{totalClickDamage}
           </div>
         )}
       </button>
 
       <div className={styles.multiplierContainer}>
         <span className={styles.multiplierLabel}>Multiplicador:</span>
-        <span className={styles.multiplierValue}>{cps.toFixed(2)}x</span>
+        <span className={styles.multiplierValue}>{(cps ?? 0).toFixed(2)}x</span>
       </div>
     </div>
   );

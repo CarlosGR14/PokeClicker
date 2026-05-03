@@ -2,11 +2,17 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { signIn, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { ZodError } from "zod";
 import styles from "./login.module.css";
 import { loginSchema, type LoginFormData } from "@/lib/validations/auth";
 
 export default function LoginPage() {
+  const router = useRouter();
+  const { data: session } = useSession();
+
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
     password: "",
@@ -15,6 +21,17 @@ export default function LoginPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  // Redirigir según el rol si ya está autenticado
+  useEffect(() => {
+    if (session?.user?.role) {
+      if (session.user.role === "admin") {
+        router.push("/admin");
+      } else if (session.user.role === "jugador") {
+        router.push("/game");
+      }
+    }
+  }, [session, router]);
 
   const validateField = (fieldName: string): string => {
     try {
@@ -77,17 +94,25 @@ export default function LoginPage() {
     }
 
     setIsLoading(true);
+    setErrors({});
 
     try {
-      // Simular envío al servidor
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      console.log("Login exitoso:", {
+      // Usar signIn de NextAuth
+      const signInResult = await signIn("credentials", {
         email: formData.email,
+        password: formData.password,
+        redirect: false,
       });
 
-      // Redirigir al juego
-      window.location.href = "/game";
+      if (signInResult?.error) {
+        setErrors({ submit: "Email o contraseña incorrectos." });
+        return;
+      }
+
+      if (signInResult?.ok) {
+        // La sesión se actualizará automáticamente y el useEffect redirigirá
+        // No hacer push aquí, dejar que el useEffect lo haga
+      }
     } catch (error) {
       setErrors({ submit: "Error al iniciar sesión. Intenta de nuevo." });
     } finally {

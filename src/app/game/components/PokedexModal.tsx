@@ -48,7 +48,7 @@ export default function PokedexModal({ open, pokemon, onClose }: Props) {
                   className={`${styles.pokedexCard} ${styles[`rarity_${p.rarity}`]}`}
                 >
                   <img
-                    src={p.image}
+                    src={p.image || undefined}
                     alt={p.name}
                     className={styles.pokedexImage}
                     loading="lazy"

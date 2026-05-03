@@ -34,7 +34,7 @@ export default function CaptureReveal({ pokemon, onClose }: Props) {
           {RARITY_LABELS[pokemon.rarity]}
         </div>
         <img
-          src={pokemon.image}
+          src={pokemon.image || undefined}
           alt={pokemon.name}
           className={styles.captureRevealImage}
         />

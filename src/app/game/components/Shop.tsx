@@ -3,7 +3,7 @@ import { PACKS, UPGRADE_ICONS, type Upgrade } from "../types";
 
 interface Props {
   upgrades: Upgrade[];
-  money: number;
+  money: number | undefined;
   isOpening: string | null;
   shopTab: "mejoras" | "sobres";
   onTabChange: (tab: "mejoras" | "sobres") => void;
@@ -13,7 +13,7 @@ interface Props {
 
 export default function Shop({
   upgrades,
-  money,
+  money = 0,
   isOpening,
   shopTab,
   onTabChange,

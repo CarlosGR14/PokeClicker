@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import styles from "./game.module.css";
 import { getPokemonById } from "@/services/pokeapi";
 import {
@@ -25,37 +26,17 @@ function getDefaultGameState(): GameState {
   return {
     money: 0,
     clicks: 0,
-    pokemonName: "Pikachu",
-    pokemonImage: "",
-    level: 1,
     cps: 0,
     upgrades: INITIAL_UPGRADES,
     collectedPokemon: [],
   };
 }
 
-function loadGameState(): GameState {
-  const saved = localStorage.getItem("pokeclicker_game");
-  if (saved) {
-    try {
-      const parsed = JSON.parse(saved);
-      return {
-        ...getDefaultGameState(),
-        ...parsed,
-        collectedPokemon: Array.isArray(parsed.collectedPokemon)
-          ? parsed.collectedPokemon
-          : [],
-      };
-    } catch {
-      // corrupted save
-    }
-  }
-  return getDefaultGameState();
-}
-
 export default function GameClient() {
   // Safe to read localStorage here — SSR is disabled for this component
-  const [gameState, setGameState] = useState<GameState>(loadGameState);
+  const { data: session } = useSession();
+  const [gameState, setGameState] = useState<GameState>(getDefaultGameState);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [clickEffect, setClickEffect] = useState<{
     x: number;
@@ -63,9 +44,7 @@ export default function GameClient() {
     id: string;
   } | null>(null);
   const [pokedexOpen, setPokedexOpen] = useState(false);
-  const [displayedPokemon, setDisplayedPokemon] = useState<
-    (CollectedPokemon | null)[]
-  >([null, null, null, null]);
+
   const [selectedDisplaySlot, setSelectedDisplaySlot] = useState<number | null>(
     null,
   );
@@ -76,7 +55,14 @@ export default function GameClient() {
   );
   const [isOpening, setIsOpening] = useState<string | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [theme, setTheme] = useState<"light" | "dark" | "system">("system");
+  const [theme, setTheme] = useState<"light" | "dark" | "system">(() => {
+    const saved = localStorage.getItem("pokeclicker_theme") as
+      | "light"
+      | "dark"
+      | "system"
+      | null;
+    return saved || "system";
+  });
 
   // Apply theme to document
   const applyTheme = (t: "light" | "dark" | "system") => {
@@ -100,48 +86,90 @@ export default function GameClient() {
     localStorage.setItem("pokeclicker_theme", newTheme);
   };
 
-  // Load theme preference on mount
+  // Load game state from BD on mount
   useEffect(() => {
-    const saved = localStorage.getItem("pokeclicker_theme") as
-      | "light"
-      | "dark"
-      | "system"
-      | null;
-    if (saved) {
-      applyTheme(saved);
-      // eslint-disable-next-line
-      setTheme(saved);
-    } else {
-      // Default to system preference
-      applyTheme("system");
-    }
-  }, []);
+    const loadGameFromDB = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch("/api/game/state");
+        if (!response.ok) throw new Error("Failed to load game state");
 
-  // Load initial Pokémon image if not in saved state
-  useEffect(() => {
-    if (!gameState.pokemonImage) {
-      void getPokemonById("pikachu")
-        .then((pokemon) => {
-          setGameState((prev) => ({
-            ...prev,
-            pokemonName: pokemon.name,
-            pokemonImage: pokemon.image,
-          }));
-        })
-        .catch((error) => {
-          console.error("Error loading initial Pokémon:", error);
+        const data: GameState = await response.json();
+
+        // Merge BD upgrades with INITIAL_UPGRADES to ensure all upgrades are present
+        const mergedUpgrades = INITIAL_UPGRADES.map((initialUpgrade) => {
+          const dbUpgrade = data.upgrades?.find(
+            (u) => u.id === initialUpgrade.id,
+          );
+          return dbUpgrade || initialUpgrade;
         });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
-  // Save game state
+        // Fill Pokemon details from PokeAPI
+        const filledPokemon = await Promise.all(
+          data.collectedPokemon.map(async (pokemon) => {
+            if (pokemon.name && pokemon.image) return pokemon;
+            try {
+              const details = await getPokemonById(parseInt(pokemon.id));
+              return {
+                ...pokemon,
+                name: details.name,
+                image: details.image,
+              };
+            } catch (error) {
+              console.error(`Error fetching Pokemon ${pokemon.id}:`, error);
+              return pokemon;
+            }
+          }),
+        );
+
+        setGameState({
+          ...data,
+          upgrades: mergedUpgrades,
+          collectedPokemon: filledPokemon,
+        });
+      } catch (error) {
+        console.error("Error loading game state:", error);
+        // Fallback to default state
+        setGameState(getDefaultGameState());
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (session?.user?.email) {
+      loadGameFromDB();
+    }
+  }, [session?.user?.email]);
+
+  // Apply theme when it changes
   useEffect(() => {
+    applyTheme(theme);
+  }, [theme]);
+
+  // Save game state to BD
+  useEffect(() => {
+    // Don't save while still loading
+    if (isLoading) return;
+
     const timer = setTimeout(() => {
-      localStorage.setItem("pokeclicker_game", JSON.stringify(gameState));
+      const saveGameToDB = async () => {
+        try {
+          const response = await fetch("/api/game/save", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(gameState),
+          });
+          if (!response.ok) throw new Error("Failed to save game state");
+        } catch (error) {
+          console.error("Error saving game state:", error);
+        }
+      };
+
+      saveGameToDB();
     }, 500);
+
     return () => clearTimeout(timer);
-  }, [gameState]);
+  }, [gameState, isLoading]);
 
   // Passive income - optimized with requestAnimationFrame
   useEffect(() => {
@@ -175,11 +203,17 @@ export default function GameClient() {
     const y = e.clientY - rect.top;
     setClickEffect({ x, y, id: Math.random().toString() });
     setTimeout(() => setClickEffect(null), 700);
+
+    // Calcular total click damage (1 + bonus from upgrades)
+    const totalClickBonus = gameState.upgrades
+      .filter((u) => u.count > 0 && (u.clickBonus || 0) > 0)
+      .reduce((sum, u) => sum + (u.clickBonus || 0) * u.count, 0);
+    const totalClickDamage = 1 + totalClickBonus;
+
     setGameState((prev) => ({
       ...prev,
-      money: prev.money + 1,
-      clicks: prev.clicks + 1,
-      level: Math.floor((prev.clicks + 1) / 100) + 1,
+      money: prev.money + totalClickDamage,
+      clicks: prev.clicks + totalClickDamage,
     }));
   };
 
@@ -229,19 +263,50 @@ export default function GameClient() {
   };
 
   const handleDisplaySlotSelect = (slot: number, pokemon: CollectedPokemon) => {
-    setDisplayedPokemon((prev) => {
-      const next = [...prev];
-      next[slot] = pokemon;
-      return next;
+    // Update gameState to reflect the new position
+    setGameState((prev) => {
+      const updated = prev.collectedPokemon.map((p) => {
+        // Clear indiceSlot from any pokemon currently in this slot
+        if (p.indiceSlot === slot) {
+          return { ...p, indiceSlot: null };
+        }
+        // If this is the pokemon being assigned, set its indiceSlot
+        if (p.id === pokemon.id) {
+          return { ...p, indiceSlot: slot };
+        }
+        return p;
+      });
+      return {
+        ...prev,
+        collectedPokemon: updated,
+      };
     });
+
     setSelectedDisplaySlot(null);
   };
+
+  // Derive displayedPokemon from gameState instead of maintaining as state
+  const displayedPokemon: (CollectedPokemon | null)[] = [
+    null,
+    null,
+    null,
+    null,
+  ];
+  gameState.collectedPokemon.forEach((pokemon) => {
+    if (
+      pokemon.indiceSlot !== null &&
+      pokemon.indiceSlot !== undefined &&
+      pokemon.indiceSlot >= 0 &&
+      pokemon.indiceSlot < 4
+    ) {
+      displayedPokemon[pokemon.indiceSlot] = pokemon;
+    }
+  });
 
   return (
     <div className={styles.gameContainer}>
       <GameHeader
-        pokemonName={gameState.pokemonName}
-        level={gameState.level}
+        userName={session?.user?.name || "Jugador"}
         money={gameState.money}
         onSettingsClick={() => setSettingsOpen(true)}
       />
@@ -250,6 +315,9 @@ export default function GameClient() {
         <main className={styles.gameCenter}>
           <ClickerSection
             cps={gameState.cps}
+            clickBonus={gameState.upgrades
+              .filter((u) => u.count > 0 && (u.clickBonus || 0) > 0)
+              .reduce((sum, u) => sum + (u.clickBonus || 0) * u.count, 0)}
             clickEffect={clickEffect}
             onPokeballClick={handlePokemonClick}
           />

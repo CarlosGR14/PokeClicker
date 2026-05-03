@@ -310,33 +310,63 @@ button:focus-visible {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-md);
   width: 100%;
   flex-shrink: 0;
+  padding: 0 var(--spacing-sm);
+}
+
+.expositorHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
 }
 
 .expositorTitle {
-  font-size: 1rem;
+  font-size: clamp(1rem, 5vw, 1.5rem);
   font-weight: 700;
   color: var(--color-primary);
   margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.expositorSubtitle {
+  font-size: clamp(0.7rem, 3vw, 0.75rem);
+  color: var(--text-muted);
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
+.expositorFrame {
+  background: linear-gradient(
+    135deg,
+    var(--bg-card) 0%,
+    rgba(255, 255, 255, 0.5) 100%
+  );
+  border: 3px solid var(--color-primary);
+  border-radius: 16px;
+  padding: clamp(var(--spacing-md), 4vw, var(--spacing-lg));
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  width: 100%;
+  max-width: 520px;
+}
+
 .displaySlots {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--spacing-sm);
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(var(--spacing-sm), 2vw, var(--spacing-md));
   width: 100%;
-  max-width: 320px;
 }
 
 .displaySlot {
-  width: 70px;
-  height: 70px;
-  border: 2px solid var(--neutral-200);
-  border-radius: 8px;
+  width: 100%;
+  aspect-ratio: 1;
+  border: 3px solid var(--neutral-300);
+  border-radius: 12px;
   background-color: var(--bg-app);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -345,32 +375,61 @@ button:focus-visible {
   justify-content: center;
   padding: 0;
   overflow: hidden;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  min-height: 80px;
 }
 
 .displaySlot:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   border-color: var(--color-primary);
+}
+
+.displaySlot:active {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .displaySlotEmpty {
   border-style: dashed;
   border-color: var(--color-accent);
-  background-color: rgba(255, 203, 5, 0.05);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 203, 5, 0.08) 0%,
+    transparent 100%
+  );
 }
 
 .displaySlotEmpty:hover {
   border-color: var(--color-primary);
-  background-color: rgba(238, 21, 21, 0.05);
+  background: linear-gradient(
+    135deg,
+    rgba(238, 21, 21, 0.1) 0%,
+    transparent 100%
+  );
 }
 
 .displaySlotFilled {
   border-color: var(--color-primary);
-  background-color: var(--bg-card);
+  background: linear-gradient(
+    135deg,
+    var(--bg-card) 0%,
+    rgba(238, 21, 21, 0.05) 100%
+  );
+  box-shadow:
+    0 4px 16px rgba(238, 21, 21, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.displaySlotFilled:hover {
+  box-shadow:
+    0 8px 24px rgba(238, 21, 21, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .displaySlotPlaceholder {
-  font-size: 1.5rem;
+  font-size: clamp(1.5rem, 5vw, 2rem);
   color: var(--color-accent);
   font-weight: 700;
 }
@@ -379,7 +438,56 @@ button:focus-visible {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  padding: var(--spacing-xs);
+  padding: var(--spacing-sm);
+}
+
+.rarityBadge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: clamp(20px, 6vw, 28px);
+  height: clamp(20px, 6vw, 28px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(0.6rem, 2vw, 0.85rem);
+  font-weight: 700;
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.rarityCommon {
+  background-color: oklch(65% 0.08 145);
+}
+
+.rarityRare {
+  background-color: oklch(60% 0.16 250);
+}
+
+.rarityEpic {
+  background-color: oklch(68% 0.14 50);
+}
+
+.rarityLegendary {
+  background: linear-gradient(
+    135deg,
+    oklch(75% 0.15 85) 0%,
+    oklch(68% 0.14 50) 100%
+  );
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    0 0 12px rgba(255, 203, 5, 0.4);
+}
+
+.expositorActions {
+  display: flex;
+  gap: clamp(var(--spacing-xs), 2vw, var(--spacing-sm));
+  width: 100%;
+  max-width: 520px;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 0 var(--spacing-sm);
 }
 
 .showcaseFrame {
@@ -678,12 +786,14 @@ button:focus-visible {
   }
 
   .displaySlots {
-    max-width: 280px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(var(--spacing-xs), 1.5vw, var(--spacing-sm));
   }
 
   .displaySlot {
-    width: 60px;
-    height: 60px;
+    width: 100%;
+    aspect-ratio: 1;
+    min-height: 60px;
   }
 
   .pokedexModal {
@@ -745,6 +855,17 @@ button:focus-visible {
   }
 }
 
+/* Desktop - 641px and above */
+@media (min-width: 641px) {
+  .displaySlots {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .expositorTitle {
+    font-size: 1.5rem;
+  }
+}
+
 /* Extra small screens (<320px width) - prevent overflow */
 @media (max-width: 320px) {
   .mainLayout {
@@ -782,13 +903,14 @@ button:focus-visible {
   }
 
   .displaySlots {
-    max-width: 240px;
+    grid-template-columns: repeat(4, 1fr);
     gap: var(--spacing-xs);
   }
 
   .displaySlot {
-    width: 50px;
-    height: 50px;
+    width: 100%;
+    aspect-ratio: 1;
+    min-height: 50px;
   }
 
   .pokedexGrid {
@@ -873,17 +995,20 @@ button:focus-visible {
   transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
   font-family: var(--font-main);
+  opacity: 0.6;
 }
 
 .shopTab:hover {
+  opacity: 0.85;
   color: var(--text-main);
-  background: var(--neutral-200);
 }
 
 .shopTabActive {
+  opacity: 1;
   background: var(--bg-card);
   color: var(--color-primary);
-  box-shadow: 0 1px 5px oklch(0% 0 0 / 0.12);
+  font-weight: 700;
+  box-shadow: 0 2px 8px oklch(0% 0 0 / 0.15);
 }
 
 .shopContent {

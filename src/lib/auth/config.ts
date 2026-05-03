@@ -1,10 +1,10 @@
-import { type NextAuthConfig } from "next-auth";
+import { type NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { loginSchema } from "@/lib/validations/auth";
 import { prisma } from "@/lib/db";
 import bcrypt from "bcrypt";
 
-export const authConfig: NextAuthConfig = {
+export const authConfig: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -40,6 +40,7 @@ export const authConfig: NextAuthConfig = {
           id: user.id.toString(),
           email: user.email,
           name: user.nombre,
+          role: user.role || "user",
         };
       },
     }),
@@ -47,6 +48,13 @@ export const authConfig: NextAuthConfig = {
   pages: {
     signIn: "/auth/login",
     error: "/auth/login",
+  },
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 días
+  },
+  jwt: {
+    maxAge: 30 * 24 * 60 * 60, // 30 días
   },
   callbacks: {
     async jwt({ token, user }) {
@@ -60,16 +68,6 @@ export const authConfig: NextAuthConfig = {
         session.user.id = token.id as string;
       }
       return session;
-    },
-    authorized({ auth, request }) {
-      // Proteger rutas /game
-      const isGameRoute = request.nextUrl.pathname.startsWith("/game");
-      const isAuthenticated = !!auth?.user;
-
-      if (isGameRoute && !isAuthenticated) {
-        return false; // Redirige a signIn
-      }
-      return true;
     },
   },
 };

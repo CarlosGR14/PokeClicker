@@ -17,39 +17,60 @@ export default function Expositor({
   onPokedexOpen,
   onShopOpen,
 }: Props) {
+  const rarityColors: Record<string, string> = {
+    common: styles.rarityCommon,
+    rare: styles.rarityRare,
+    epic: styles.rarityEpic,
+    legendary: styles.rarityLegendary,
+  };
+
   return (
     <div className={styles.expositorSection}>
-      <h3 className={styles.expositorTitle}>Expositor</h3>
-      <div className={styles.displaySlots}>
-        {displayedPokemon.map((pokemon, index) => (
-          <button
-            key={index}
-            className={`${styles.displaySlot} ${pokemon ? styles.displaySlotFilled : styles.displaySlotEmpty}`}
-            onClick={() => onSlotClick(index)}
-            title={
-              pokemon
-                ? `${pokemon.name} (${pokemon.rarity})`
-                : "Seleccionar pokémon"
-            }
-          >
-            {pokemon ? (
-              <img
-                src={pokemon.image}
-                alt={pokemon.name}
-                className={styles.displaySlotImage}
-              />
-            ) : (
-              <span className={styles.displaySlotPlaceholder}>+</span>
-            )}
-          </button>
-        ))}
+      <div className={styles.expositorHeader}>
+        <h3 className={styles.expositorTitle}>✨ Expositor</h3>
+        <span className={styles.expositorSubtitle}>Exhibición de Pokémon</span>
       </div>
-      <button className={styles.pokedexBtn} onClick={onPokedexOpen}>
-        📖 Pokédex ({collectedCount})
-      </button>
-      <button className={styles.openShopMobileBtn} onClick={onShopOpen}>
-        🛒 Abrir Tienda
-      </button>
+      <div className={styles.expositorFrame}>
+        <div className={styles.displaySlots}>
+          {displayedPokemon.map((pokemon, index) => (
+            <button
+              key={index}
+              className={`${styles.displaySlot} ${pokemon ? styles.displaySlotFilled : styles.displaySlotEmpty}`}
+              onClick={() => onSlotClick(index)}
+              title={
+                pokemon
+                  ? `${pokemon.name} (${pokemon.rarity})`
+                  : "Seleccionar pokémon"
+              }
+            >
+              {pokemon ? (
+                <>
+                  <img
+                    src={pokemon.image || undefined}
+                    alt={pokemon.name}
+                    className={styles.displaySlotImage}
+                  />
+                  <div
+                    className={`${styles.rarityBadge} ${rarityColors[pokemon.rarity] || styles.rarityCommon}`}
+                  >
+                    {pokemon.rarity.charAt(0).toUpperCase()}
+                  </div>
+                </>
+              ) : (
+                <span className={styles.displaySlotPlaceholder}>+</span>
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className={styles.expositorActions}>
+        <button className={styles.pokedexBtn} onClick={onPokedexOpen}>
+          📖 Pokédex ({collectedCount})
+        </button>
+        <button className={styles.openShopMobileBtn} onClick={onShopOpen}>
+          🛒 Abrir Tienda
+        </button>
+      </div>
     </div>
   );
 }

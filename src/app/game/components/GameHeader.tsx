@@ -1,41 +1,25 @@
-import { useEffect, useState } from "react";
+import { signOut } from "next-auth/react";
 import styles from "../game.module.css";
 
 interface Props {
-  pokemonName: string;
-  level: number;
-  money: number;
+  userName: string;
+  money: number | undefined;
   onSettingsClick?: () => void;
 }
 
 export default function GameHeader({
-  pokemonName,
-  level,
-  money,
+  userName,
+  money = 0,
   onSettingsClick,
 }: Props) {
-  const [isLevelingUp, setIsLevelingUp] = useState(false);
-  const [prevLevel, setPrevLevel] = useState(level);
-
-  useEffect(() => {
-    if (level > prevLevel) {
-      setIsLevelingUp(true);
-      const timer = setTimeout(() => setIsLevelingUp(false), 800);
-      setPrevLevel(level);
-      return () => clearTimeout(timer);
-    }
-    setPrevLevel(level);
-  }, [level, prevLevel]);
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: "/auth/login" });
+  };
 
   return (
     <header className={styles.header}>
       <div className={styles.headerLeft}>
-        <h1 className={styles.playerName}>{pokemonName}</h1>
-        <div
-          className={`${styles.level} ${isLevelingUp ? styles.animateLevelUp : ""}`}
-        >
-          Lvl. {level}
-        </div>
+        <h1 className={styles.playerName}>{userName}</h1>
       </div>
 
       <div className={styles.headerCenter}>
@@ -65,6 +49,7 @@ export default function GameHeader({
         <button
           className={styles.headerBtn}
           aria-label="Cerrar sesión"
+          onClick={handleLogout}
           type="button"
         >
           🚪
