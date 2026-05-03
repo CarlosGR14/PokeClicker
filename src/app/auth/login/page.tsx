@@ -2,45 +2,34 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { ZodError } from "zod";
 import styles from "./login.module.css";
-
-interface FormErrors {
-  [key: string]: string;
-}
+import { loginSchema, type LoginFormData } from "@/lib/validations/auth";
 
 export default function LoginPage() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<LoginFormData>({
     email: "",
     password: "",
   });
 
-  const [errors, setErrors] = useState<FormErrors>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [touched, setTouched] = useState<{ [key: string]: boolean }>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
 
-  const validateField = (name: string, value: string): string => {
-    switch (name) {
-      case "email":
-        if (!value.trim()) return "El email es requerido";
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-          return "Por favor ingresa un email válido";
-        }
-        return "";
-      case "password":
-        if (!value) return "La contraseña es requerida";
-        return "";
-      default:
-        return "";
+  const validateField = (fieldName: string): string => {
+    try {
+      // Validar el campo específico con el esquema completo
+      loginSchema.parse(formData);
+      return "";
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const fieldError = error.issues.find(
+          (issue) => issue.path[0] === fieldName,
+        );
+        return fieldError?.message || "";
+      }
+      return "";
     }
-  };
-
-  const validateForm = (): FormErrors => {
-    const newErrors: FormErrors = {};
-    Object.keys(formData).forEach((key) => {
-      const error = validateField(key, formData[key as keyof typeof formData]);
-      if (error) newErrors[key] = error;
-    });
-    return newErrors;
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,7 +40,7 @@ export default function LoginPage() {
     }));
     // Validar mientras se escribe si el campo fue tocado
     if (touched[name]) {
-      const error = validateField(name, value);
+      const error = validateField(name);
       setErrors((prev) => ({
         ...prev,
         [name]: error,
@@ -60,12 +49,12 @@ export default function LoginPage() {
   };
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+    const { name } = e.target;
     setTouched((prev) => ({
       ...prev,
       [name]: true,
     }));
-    const error = validateField(name, value);
+    const error = validateField(name);
     setErrors((prev) => ({
       ...prev,
       [name]: error,
@@ -75,8 +64,14 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const newErrors = validateForm();
-    if (Object.keys(newErrors).length > 0) {
+    // Validar el formulario completo con Zod
+    const result = loginSchema.safeParse(formData);
+    if (!result.success) {
+      const newErrors: Record<string, string> = {};
+      result.error.issues.forEach((err) => {
+        const path = err.path[0] as string;
+        newErrors[path] = err.message;
+      });
       setErrors(newErrors);
       return;
     }

@@ -4,24 +4,30 @@
 
 .container {
   display: flex;
-  justify-content: center;
+  justify-content: right;
   align-items: center;
   min-height: 100vh;
   padding: 16px;
-  background: linear-gradient(
-    135deg,
-    oklch(98% 0.005 20) 0%,
-    oklch(96% 0.008 20) 100%
-  );
+  padding-right: 100px;
+  background-image: url("/fondos/fondoRegister.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
 
 @media (prefers-color-scheme: dark) {
   .container {
-    background: linear-gradient(
-      135deg,
-      oklch(15% 0.005 20) 0%,
-      oklch(18% 0.008 20) 100%
-    );
+    background-image: url("/fondos/fondoRegister.jpg");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    background-attachment: scroll;
+    background-size: cover;
   }
 }
 

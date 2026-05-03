@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model Usuario {
+  id              Int       @id @default(autoincrement())
+  email           String    @unique
+  nombre          String    @unique
+  password        String
+  monedas         Int       @default(0)
+  multiplicador   Float     @default(1.0)
+  role            String    @default("jugador")
+  fecha_creacion  DateTime  @default(now())
+  
+  // Relaciones
+  pokemons        Pokemon[]
+  mejoras         Mejora[]
+
+  @@map("usuario")
+}
+
+model Pokemon {
+  id              Int       @id @default(autoincrement())
+  usuario_id      Int
+  usuario         Usuario   @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+  pokeapi_id      Int
+  fecha_captura   DateTime  @default(now())
+  expuesto        Boolean   @default(false)
+
+  @@map("pokemon")
+}
+
+model Mejora {
+  id                    Int       @id @default(autoincrement())
+  usuario_id            Int
+  usuario               Usuario   @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+  nombre_item           String
+  precio_actual         Int
+  valor_multiplicador   Float
+
+  @@map("mejora")
+}

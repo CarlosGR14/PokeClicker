@@ -2,54 +2,37 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { ZodError } from "zod";
 import styles from "./register.module.css";
-
-interface FormErrors {
-  [key: string]: string;
-}
+import { registerSchema, type RegisterFormData } from "@/lib/validations/auth";
 
 export default function RegisterPage() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<RegisterFormData>({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
 
-  const [errors, setErrors] = useState<FormErrors>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [touched, setTouched] = useState<{ [key: string]: boolean }>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
 
-  const validateField = (name: string, value: string): string => {
-    switch (name) {
-      case "name":
-        return !value.trim() ? "El nombre es requerido" : "";
-      case "email":
-        if (!value.trim()) return "El email es requerido";
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-          return "Por favor ingresa un email válido";
-        }
-        return "";
-      case "password":
-        if (!value) return "La contraseña es requerida";
-        if (value.length < 6) return "Mínimo 6 caracteres";
-        return "";
-      case "confirmPassword":
-        if (value !== formData.password) return "Las contraseñas no coinciden";
-        return "";
-      default:
-        return "";
+  const validateField = (fieldName: string): string => {
+    try {
+      // Validar el campo específico con el esquema completo
+      registerSchema.parse(formData);
+      return "";
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const fieldError = error.issues.find(
+          (issue) => issue.path[0] === fieldName,
+        );
+        return fieldError?.message || "";
+      }
+      return "";
     }
-  };
-
-  const validateForm = (): FormErrors => {
-    const newErrors: FormErrors = {};
-    Object.keys(formData).forEach((key) => {
-      const error = validateField(key, formData[key as keyof typeof formData]);
-      if (error) newErrors[key] = error;
-    });
-    return newErrors;
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,7 +43,7 @@ export default function RegisterPage() {
     }));
     // Validar mientras se escribe si el campo fue tocado
     if (touched[name]) {
-      const error = validateField(name, value);
+      const error = validateField(name);
       setErrors((prev) => ({
         ...prev,
         [name]: error,
@@ -69,12 +52,12 @@ export default function RegisterPage() {
   };
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+    const { name } = e.target;
     setTouched((prev) => ({
       ...prev,
       [name]: true,
     }));
-    const error = validateField(name, value);
+    const error = validateField(name);
     setErrors((prev) => ({
       ...prev,
       [name]: error,
@@ -84,8 +67,14 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const newErrors = validateForm();
-    if (Object.keys(newErrors).length > 0) {
+    // Validar el formulario completo con Zod
+    const result = registerSchema.safeParse(formData);
+    if (!result.success) {
+      const newErrors: Record<string, string> = {};
+      result.error.issues.forEach((err) => {
+        const path = err.path[0] as string;
+        newErrors[path] = err.message;
+      });
       setErrors(newErrors);
       return;
     }
@@ -93,13 +82,31 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      // Simular envío al servidor
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      console.log("Registro exitoso:", {
-        name: formData.name,
-        email: formData.email,
+      // Enviar datos al servidor
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        }),
       });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("Error en registro:", data);
+        setErrors({
+          submit: data.error || "Error al registrarse. Intenta de nuevo.",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      console.log("Registro exitoso:", data);
 
       setSuccess(true);
       setFormData({
@@ -108,14 +115,15 @@ export default function RegisterPage() {
         password: "",
         confirmPassword: "",
       });
+      setErrors({});
 
       // Redirigir después de 2 segundos
       setTimeout(() => {
         window.location.href = "/auth/login";
       }, 2000);
-    } catch {
-      setErrors({ submit: "Error al registrarse. Intenta de nuevo." });
-    } finally {
+    } catch (error) {
+      console.error("Error en fetch:", error);
+      setErrors({ submit: "Error al conectar con el servidor." });
       setIsLoading(false);
     }
   };
