@@ -29,12 +29,30 @@ export async function POST(request: Request) {
   try {
     // Verificar autenticación
     const session = await getServerSession(authOptions);
+
+    // Log para debugging
+    console.log(
+      "Save request - Session:",
+      session?.user?.email || "No session",
+    );
+    console.log("Save request - Headers Host:", request.headers.get("host"));
+
     if (!session?.user?.email) {
+      console.log("Save failed - No authenticated user");
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
 
     // Obtener cuerpo de la solicitud
     const gameState: GameState = await request.json();
+
+    // Log del contenido recibido
+    console.log("Save request - Money:", gameState.money);
+    console.log("Save request - Clicks:", gameState.clicks);
+    console.log("Save request - Upgrades count:", gameState.upgrades.length);
+    console.log(
+      "Save request - Pokemon count:",
+      gameState.collectedPokemon.length,
+    );
 
     // Validar datos
     if (

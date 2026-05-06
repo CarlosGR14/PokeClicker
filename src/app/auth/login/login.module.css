@@ -26,8 +26,10 @@
 
 @media (max-width: 768px) {
   .container {
+    justify-content: center;
     background-attachment: scroll;
     background-size: cover;
+    padding-right: 16px;
   }
 }
 

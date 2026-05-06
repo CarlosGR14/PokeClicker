@@ -670,7 +670,7 @@ button:focus-visible {
 .pokedexName {
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--text-main);
+  color: #000000; /* Siempre negro, incluso en modo oscuro */
   word-break: break-word;
 }
 

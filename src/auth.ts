@@ -27,6 +27,7 @@ declare module "next-auth/jwt" {
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
+  useSecureCookies: false, // Cambiar a false en desarrollo
 
   providers: [
     CredentialsProvider({
@@ -79,11 +80,9 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
-
   pages: {
     signIn: "/auth/login",
   },
-
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 días

@@ -71,6 +71,7 @@ export async function GET() {
         rarity: getRarityByPokemonId(pokemon.pokeapi_id),
         indiceSlot: pokemon.indiceSlot,
         expuesto: pokemon.expuesto,
+        pokeapi_id: pokemon.pokeapi_id,
       })),
     };
 

@@ -23,6 +23,7 @@ export interface CollectedPokemon {
   rarity: "common" | "rare" | "epic" | "legendary";
   indiceSlot?: number | null; // 0-3 if displayed, null otherwise
   expuesto?: boolean; // Whether pokemon is displayed in expositor
+  pokeapi_id?: number; // Adicional para compatibilidad
 }
 
 export interface Pack {

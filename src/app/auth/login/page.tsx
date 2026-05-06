@@ -110,8 +110,9 @@ export default function LoginPage() {
       }
 
       if (signInResult?.ok) {
-        // La sesión se actualizará automáticamente y el useEffect redirigirá
-        // No hacer push aquí, dejar que el useEffect lo haga
+        // Redirigir directamente a /game después del login exitoso
+        // No esperar al useEffect porque la sesión no se refresca bien en todos los dispositivos
+        router.push("/game");
       }
     } catch (error) {
       setErrors({ submit: "Error al iniciar sesión. Intenta de nuevo." });
