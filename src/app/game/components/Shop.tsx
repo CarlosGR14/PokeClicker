@@ -1,5 +1,19 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import styles from "../game.module.css";
 import { PACKS, UPGRADE_ICONS, type Upgrade } from "../types";
+
+// Mapeo de IDs de mejoras a nombres de items en PokeAPI
+const UPGRADE_TO_ITEM_MAP: Record<string, string> = {
+  pokeball: "poke-ball",
+  greatball: "great-ball",
+  ultraball: "ultra-ball",
+  masterball: "master-ball",
+  luckyPunch: "lucky-punch",
+  focusBand: "focus-band",
+  lifeorb: "life-orb",
+};
 
 interface Props {
   upgrades: Upgrade[];
@@ -20,6 +34,38 @@ export default function Shop({
   onBuyUpgrade,
   onOpenPack,
 }: Props) {
+  const [itemImages, setItemImages] = useState<Map<string, string>>(new Map());
+
+  useEffect(() => {
+    const loadItemImages = async () => {
+      const images = new Map<string, string>();
+      for (const upgrade of upgrades) {
+        const pokeapiItemName = UPGRADE_TO_ITEM_MAP[upgrade.id];
+        if (pokeapiItemName && !itemImages.has(upgrade.id)) {
+          try {
+            const response = await fetch(
+              `/api/pokeapi/item?id=${encodeURIComponent(pokeapiItemName)}`,
+            );
+            if (response.ok) {
+              const item = await response.json();
+              if (item.image) {
+                images.set(upgrade.id, item.image);
+              }
+            }
+          } catch (error) {
+            console.error(`Failed to load image for ${upgrade.id}:`, error);
+          }
+        }
+      }
+      if (images.size > 0) {
+        setItemImages((prev) => new Map([...prev, ...images]));
+      }
+    };
+
+    if (shopTab === "mejoras") {
+      loadItemImages();
+    }
+  }, [shopTab, upgrades, itemImages]);
   return (
     <>
       <div className={styles.shopHeader}>
@@ -33,7 +79,7 @@ export default function Shop({
             aria-current={shopTab === "mejoras" ? "page" : undefined}
             type="button"
           >
-            ⬆ Mejoras
+            Mejoras
           </button>
           <button
             className={`${styles.shopTab} ${shopTab === "sobres" ? styles.shopTabActive : ""}`}
@@ -43,7 +89,7 @@ export default function Shop({
             aria-current={shopTab === "sobres" ? "page" : undefined}
             type="button"
           >
-            📦 Sobres
+            Sobres
           </button>
         </div>
       </div>
@@ -53,13 +99,27 @@ export default function Shop({
           <div className={styles.upgradesList}>
             {upgrades.map((upgrade) => {
               const canAfford = money >= upgrade.cost;
+              const itemImage = itemImages.get(upgrade.id);
               return (
                 <div
                   key={upgrade.id}
                   className={`${styles.upgradeCard} ${!canAfford ? styles.upgradeCardDisabled : ""}`}
                 >
                   <div className={styles.upgradeIconBubble}>
-                    {UPGRADE_ICONS[upgrade.id] ?? "🔵"}
+                    {itemImage ? (
+                      <img
+                        src={itemImage}
+                        alt={upgrade.name}
+                        className={styles.upgradeImage}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "contain",
+                        }}
+                      />
+                    ) : (
+                      (UPGRADE_ICONS[upgrade.id] ?? "🔵")
+                    )}
                   </div>
                   <div className={styles.upgradeInfo}>
                     <span className={styles.upgradeName}>{upgrade.name}</span>
@@ -111,28 +171,28 @@ export default function Shop({
                       <span
                         className={`${styles.rarityPill} ${styles.rarityCommonPill}`}
                       >
-                        ⚪ {pack.probabilities.common}% Común
+                        {pack.probabilities.common}% Común
                       </span>
                     )}
                     {pack.probabilities.rare !== undefined && (
                       <span
                         className={`${styles.rarityPill} ${styles.rarityRarePill}`}
                       >
-                        🟢 {pack.probabilities.rare}% Raro
+                        {pack.probabilities.rare}% Raro
                       </span>
                     )}
                     {pack.probabilities.epic !== undefined && (
                       <span
                         className={`${styles.rarityPill} ${styles.rarityEpicPill}`}
                       >
-                        💜 {pack.probabilities.epic}% Épico
+                        {pack.probabilities.epic}% Épico
                       </span>
                     )}
                     {pack.probabilities.legendary !== undefined && (
                       <span
                         className={`${styles.rarityPill} ${styles.rarityLegendaryPill}`}
                       >
-                        ⭐ {pack.probabilities.legendary}% Legendario
+                        {pack.probabilities.legendary}% Legendario
                       </span>
                     )}
                   </div>

@@ -30,6 +30,15 @@ export interface PokemonSpecies {
   isMythical: boolean;
 }
 
+export interface Item {
+  id: number;
+  name: string;
+  image: string;
+  category: string;
+  cost: number;
+  description: string;
+}
+
 /**
  * Get a random Pokémon
  * Returns a Pokémon with ID between 1 and 1025
@@ -176,6 +185,121 @@ export async function determinePokemonRarity(
 export async function getRandomPokemonBatch(count: number): Promise<Pokemon[]> {
   const promises = Array.from({ length: count }, () => getRandomPokemon());
   return Promise.all(promises);
+}
+
+/**
+ * Get item by ID or name
+ */
+export async function getItemById(idOrName: number | string): Promise<Item> {
+  try {
+    const cacheKey = `item_${idOrName}`;
+
+    const cached = cache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < POKEMON_CACHE_DURATION) {
+      return cached.data as Item;
+    }
+
+    const response = await fetch(`${POKEAPI_BASE_URL}/item/${idOrName}`, {
+      cache: "force-cache",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch item: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    const item: Item = {
+      id: data.id,
+      name: capitalizeFirstLetter(data.name),
+      image: data.sprites?.default || "",
+      category: data.category?.name || "misc",
+      cost: data.cost || 0,
+      description:
+        data.flavor_text_entries?.find(
+          (entry: { language: { name: string } }) =>
+            entry.language.name === "en",
+        )?.text || "",
+    };
+
+    cache.set(cacheKey, { data: item, timestamp: Date.now() });
+
+    return item;
+  } catch (error) {
+    console.error("Error fetching item:", error);
+    throw error;
+  }
+}
+
+/**
+ * Get items by category
+ */
+export async function getItemsByCategory(category: string): Promise<Item[]> {
+  try {
+    const cacheKey = `items_category_${category}`;
+
+    const cached = cache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < POKEMON_CACHE_DURATION) {
+      return cached.data as Item[];
+    }
+
+    const response = await fetch(
+      `${POKEAPI_BASE_URL}/item-category/${category}`,
+      {
+        cache: "force-cache",
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch items: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    const items: Item[] = await Promise.all(
+      data.items.map(async (itemRef: { name: string }) =>
+        getItemById(itemRef.name),
+      ),
+    );
+
+    cache.set(cacheKey, { data: items, timestamp: Date.now() });
+
+    return items;
+  } catch (error) {
+    console.error("Error fetching items by category:", error);
+    throw error;
+  }
+}
+
+/**
+ * Get a list of shop items with limit
+ */
+export async function getShopItems(limit: number = 10): Promise<Item[]> {
+  try {
+    const response = await fetch(
+      `${POKEAPI_BASE_URL}/item?limit=${limit}&offset=0`,
+      {
+        cache: "force-cache",
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch items: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    const items: Item[] = await Promise.all(
+      data.results.map(async (itemRef: { name: string }) =>
+        getItemById(itemRef.name),
+      ),
+    );
+
+    return items;
+  } catch (error) {
+    console.error("Error fetching shop items:", error);
+    throw error;
+  }
 }
 
 /**

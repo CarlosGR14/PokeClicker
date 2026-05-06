@@ -14,7 +14,7 @@ export default withAuth(
     }
 
     if (pathname.startsWith("/game")) {
-      if (token?.role !== "jugador") {
+      if (!token) {
         return NextResponse.redirect(new URL("/auth/login", req.url));
       }
     }

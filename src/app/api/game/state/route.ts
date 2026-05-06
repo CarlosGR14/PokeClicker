@@ -32,31 +32,38 @@ export async function GET() {
 
     // Mapear datos a GameState
     // Asegurar que money, clicks y cps nunca sean undefined
+    const upgrades = usuario.mejoras.map((mejora) => {
+      const cpsBonus = mejora.valor_multiplicador || 0;
+      const clickBonus = mejora.click_bonus || 0;
+
+      return {
+        id: mejora.nombre_item
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
+          .replace(/\s+/g, ""),
+        name: mejora.nombre_item,
+        cost: mejora.precio_actual || 0,
+        count: mejora.cantidad || 0,
+        cpsBonus,
+        clickBonus: clickBonus > 0 ? clickBonus : undefined,
+        description:
+          clickBonus > 0
+            ? `+${clickBonus} por clic`
+            : `+${cpsBonus} por segundo`,
+      };
+    });
+
+    // Recalcular cps basado en mejoras actuales
+    const calculatedCps = upgrades.reduce((total, upgrade) => {
+      return total + upgrade.cpsBonus * upgrade.count;
+    }, 0);
+
     const gameState = {
       money: usuario.monedas || 0,
       clicks: Number(usuario.clicks) || 0,
-      cps: usuario.cps || 0,
-      upgrades: usuario.mejoras.map((mejora) => {
-        const cpsBonus = mejora.valor_multiplicador || 0;
-        const clickBonus = mejora.click_bonus || 0;
-
-        return {
-          id: mejora.nombre_item
-            .toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
-            .replace(/\s+/g, ""),
-          name: mejora.nombre_item,
-          cost: mejora.precio_actual || 0,
-          count: mejora.cantidad || 0,
-          cpsBonus,
-          clickBonus: clickBonus > 0 ? clickBonus : undefined,
-          description:
-            clickBonus > 0
-              ? `+${clickBonus} por clic`
-              : `+${cpsBonus} por segundo`,
-        };
-      }),
+      cps: calculatedCps,
+      upgrades,
       collectedPokemon: usuario.pokemons.map((pokemon) => ({
         id: `${pokemon.pokeapi_id}`, // Use pokeapi_id as the unique identifier
         name: "", // Se llena en frontend con PokeAPI

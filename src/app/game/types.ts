@@ -72,8 +72,8 @@ export const INITIAL_UPGRADES: Upgrade[] = [
     description: "+100 por segundo",
   },
   {
-    id: "powerglove",
-    name: "Power Glove",
+    id: "luckyPunch",
+    name: "Lucky Punch",
     cost: 50,
     count: 0,
     cpsBonus: 0,
@@ -81,8 +81,8 @@ export const INITIAL_UPGRADES: Upgrade[] = [
     description: "+1 por clic",
   },
   {
-    id: "strengthband",
-    name: "Strength Band",
+    id: "focusBand",
+    name: "Focus Band",
     cost: 500,
     count: 0,
     cpsBonus: 0,
