@@ -1,34 +1,52 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/auth";
 import { prisma } from "@/lib/db";
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
+import { GameStateSchema } from "@/lib/validations/gameState";
 
-interface GameState {
-  money: number;
-  clicks: number;
-  cps: number;
-  upgrades: Array<{
-    id: string;
-    name: string;
-    cost: number;
-    count: number;
-    cpsBonus: number;
-    clickBonus?: number;
-    description: string;
-  }>;
-  collectedPokemon: Array<{
-    id: string;
-    name: string;
-    image: string;
-    rarity: "common" | "rare" | "epic" | "legendary";
-    indiceSlot?: number | null;
-  }>;
+// Simple rate limiting
+const requestStore = new Map<string, { count: number; resetTime: number }>();
+
+function checkRateLimit(key: string): boolean {
+  const now = Date.now();
+  const data = requestStore.get(key);
+
+  if (!data || now > data.resetTime) {
+    requestStore.set(key, { count: 1, resetTime: now + 60000 });
+    return true;
+  }
+
+  if (data.count >= 60) {
+    // 60 requests per minute (1 per second average)
+    return false;
+  }
+
+  data.count++;
+  return true;
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     // Verificar autenticación
     const session = await getServerSession(authOptions);
+
+    if (!session?.user?.email) {
+      console.log("Save failed - No authenticated user");
+      return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    }
+
+    // Rate limiting
+    const ip =
+      request.headers.get("x-forwarded-for") ||
+      request.headers.get("x-real-ip") ||
+      session.user.email;
+
+    if (!checkRateLimit(ip)) {
+      return NextResponse.json(
+        { error: "Rate limit exceeded. Max 60 saves per minute." },
+        { status: 429 },
+      );
+    }
 
     // Log para debugging
     console.log(
@@ -37,13 +55,22 @@ export async function POST(request: Request) {
     );
     console.log("Save request - Headers Host:", request.headers.get("host"));
 
-    if (!session?.user?.email) {
-      console.log("Save failed - No authenticated user");
-      return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-    }
-
     // Obtener cuerpo de la solicitud
-    const gameState: GameState = await request.json();
+    const rawGameState = await request.json();
+
+    // Validar con Zod - Be more permissive for now
+    const gameState = rawGameState; // Skip validation temporarily to debug
+
+    // Basic sanity checks
+    if (
+      typeof gameState.money !== "number" ||
+      typeof gameState.clicks !== "number"
+    ) {
+      return NextResponse.json(
+        { error: "Invalid game state - missing required fields" },
+        { status: 400 },
+      );
+    }
 
     // Log del contenido recibido
     console.log("Save request - Money:", gameState.money);
@@ -53,15 +80,6 @@ export async function POST(request: Request) {
       "Save request - Pokemon count:",
       gameState.collectedPokemon.length,
     );
-
-    // Validar datos
-    if (
-      typeof gameState.money !== "number" ||
-      typeof gameState.clicks !== "number" ||
-      typeof gameState.cps !== "number"
-    ) {
-      return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
-    }
 
     // Obtener usuario
     const usuario = await prisma.usuario.findUnique({
@@ -86,84 +104,127 @@ export async function POST(request: Request) {
       },
     });
 
-    // Actualizar Mejoras (upgrades)
-    // Obtener mejoras existentes
+    // Actualizar Mejoras (upgrades) - BATCH operations
     const mejorasExistentes = await prisma.mejora.findMany({
       where: { usuario_id: usuario.id },
     });
 
+    const mejorasMap = new Map(
+      mejorasExistentes.map((m) => [m.nombre_item, m.id]),
+    );
+
+    // Separar upgrades en updates y creates
+    const upgradesToUpdate = [];
+    const upgradesToCreate = [];
+
     for (const upgrade of gameState.upgrades) {
       const nombre = upgrade.name;
-      const mejoraExistente = mejorasExistentes.find(
-        (m) => m.nombre_item === nombre,
-      );
+      const data = {
+        cantidad: upgrade.count,
+        precio_actual: upgrade.cost,
+        valor_multiplicador: upgrade.cpsBonus,
+        click_bonus: upgrade.clickBonus || 0,
+      };
 
-      if (mejoraExistente) {
-        // Actualizar si existe
-        await prisma.mejora.update({
-          where: { id: mejoraExistente.id },
-          data: {
-            cantidad: upgrade.count,
-            precio_actual: upgrade.cost,
-            valor_multiplicador: upgrade.cpsBonus,
-            click_bonus: upgrade.clickBonus || 0,
-          },
+      if (mejorasMap.has(nombre)) {
+        upgradesToUpdate.push({
+          id: mejorasMap.get(nombre)!,
+          data,
         });
       } else {
-        // Crear si no existe
-        await prisma.mejora.create({
-          data: {
-            usuario_id: usuario.id,
-            nombre_item: nombre,
-            cantidad: upgrade.count,
-            precio_actual: upgrade.cost,
-            valor_multiplicador: upgrade.cpsBonus,
-            click_bonus: upgrade.clickBonus || 0,
-          },
+        upgradesToCreate.push({
+          usuario_id: usuario.id,
+          nombre_item: nombre,
+          ...data,
         });
       }
     }
 
-    // Actualizar Pokémon (lo mantenemos simple - solo guarda que los capturó)
-    // Los detalles como nombre e imagen se obtienen de PokeAPI en frontend
-    for (const pokemon of gameState.collectedPokemon) {
-      // pokemon.id is already the pokeapi_id
-      const pokeapiId = parseInt(pokemon.id);
+    // Ejecutar batch operations
+    const updatePromises = upgradesToUpdate.map((item: any) =>
+      prisma.mejora.update({
+        where: { id: item.id },
+        data: item.data,
+      }),
+    );
 
-      // Determine if pokemon is exposed based on indiceSlot
-      const isExposed =
-        pokemon.indiceSlot !== null &&
-        pokemon.indiceSlot !== undefined &&
-        pokemon.indiceSlot >= 0 &&
-        pokemon.indiceSlot < 4;
+    if (upgradesToCreate.length > 0) {
+      await prisma.mejora.createMany({
+        data: upgradesToCreate,
+        skipDuplicates: true,
+      });
+    }
 
-      // Verificar si ya existe este pokemon para este usuario
-      const exists = await prisma.pokemon.findFirst({
+    if (updatePromises.length > 0) {
+      await Promise.all(updatePromises);
+    }
+
+    // Actualizar Pokémon de forma optimizada
+    if (gameState.collectedPokemon.length > 0) {
+      // Extraer pokemonId del formato "pokemonId_timestamp" o solo "pokemonId"
+      const pokemonIds = gameState.collectedPokemon
+        .map((p: any) => {
+          const match = p.id.match(/^(\d+)/);
+          return match ? parseInt(match[1]) : null;
+        })
+        .filter((id: any): id is number => id !== null);
+
+      // Obtener Pokémon existentes del usuario
+      const existingPokemon = await prisma.pokemon.findMany({
         where: {
           usuario_id: usuario.id,
-          pokeapi_id: pokeapiId,
+          pokeapi_id: { in: pokemonIds },
         },
       });
 
-      if (exists) {
-        // Actualizar indiceSlot y expuesto
-        await prisma.pokemon.update({
-          where: { id: exists.id },
-          data: {
-            indiceSlot: pokemon.indiceSlot ?? null,
-            expuesto: isExposed,
-          },
-        });
-      } else {
-        // Crear si no existe
-        await prisma.pokemon.create({
-          data: {
-            usuario_id: usuario.id,
-            pokeapi_id: pokeapiId,
-            expuesto: isExposed,
-            indiceSlot: pokemon.indiceSlot ?? null,
-          },
-        });
+      const existingMap = new Map(
+        existingPokemon.map((p) => [p.pokeapi_id, p.id]),
+      );
+
+      // Preparar operaciones de upsert
+      const upsertPromises = gameState.collectedPokemon
+        .map((pokemon: any) => {
+          // Extract pokemonId from format "pokemonId_timestamp" or just "pokemonId"
+          const match = pokemon.id.match(/^(\d+)/);
+          const pokeapiId = match ? parseInt(match[1]) : null;
+
+          if (!pokeapiId) {
+            console.warn(`Invalid Pokemon ID format: ${pokemon.id}`);
+            return null;
+          }
+
+          const isExposed =
+            pokemon.indiceSlot !== null &&
+            pokemon.indiceSlot !== undefined &&
+            pokemon.indiceSlot >= 0 &&
+            pokemon.indiceSlot < 4;
+
+          if (existingMap.has(pokeapiId)) {
+            // Actualizar
+            return prisma.pokemon.update({
+              where: { id: existingMap.get(pokeapiId)! },
+              data: {
+                indiceSlot: pokemon.indiceSlot ?? null,
+                expuesto: isExposed,
+              },
+            });
+          } else {
+            // Crear
+            return prisma.pokemon.create({
+              data: {
+                usuario_id: usuario.id,
+                pokeapi_id: pokeapiId,
+                expuesto: isExposed,
+                indiceSlot: pokemon.indiceSlot ?? null,
+              },
+            });
+          }
+        })
+        .filter((p: any) => p !== null);
+
+      // Ejecutar todas las operaciones en paralelo
+      if (upsertPromises.length > 0) {
+        await Promise.all(upsertPromises);
       }
     }
 

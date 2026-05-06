@@ -32,16 +32,24 @@ export async function GET() {
 
     // Mapear datos a GameState
     // Asegurar que money, clicks y cps nunca sean undefined
+    const UPGRADE_ID_MAP: Record<string, string> = {
+      "Poké Ball": "pokeball",
+      "Great Ball": "greatball",
+      "Ultra Ball": "ultraball",
+      "Master Ball": "masterball",
+      "Lucky Punch": "luckyPunch",
+      "Focus Band": "focusBand",
+      "Life Orb": "lifeorb",
+    };
+
     const upgrades = usuario.mejoras.map((mejora) => {
       const cpsBonus = mejora.valor_multiplicador || 0;
       const clickBonus = mejora.click_bonus || 0;
 
       return {
-        id: mejora.nombre_item
-          .toLowerCase()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
-          .replace(/\s+/g, ""),
+        id:
+          UPGRADE_ID_MAP[mejora.nombre_item] ||
+          mejora.nombre_item.toLowerCase().replace(/\s+/g, ""),
         name: mejora.nombre_item,
         cost: mejora.precio_actual || 0,
         count: mejora.cantidad || 0,

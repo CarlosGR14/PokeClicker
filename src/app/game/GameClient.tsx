@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import styles from "./game.module.css";
 import { getPokemonById } from "@/services/pokeapi";
@@ -37,6 +37,10 @@ export default function GameClient() {
   const { data: session } = useSession();
   const [gameState, setGameState] = useState<GameState>(getDefaultGameState);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSavePending, setIsSavePending] = useState(false);
+  const lastSaveRef = useRef<number>(0);
+  const needsSaveRef = useRef<boolean>(false);
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [clickEffect, setClickEffect] = useState<{
     x: number;
@@ -146,30 +150,119 @@ export default function GameClient() {
     applyTheme(theme);
   }, [theme]);
 
-  // Save game state to BD
-  useEffect(() => {
-    // Don't save while still loading
-    if (isLoading) return;
+  // Save game state to BD - with cooldown and importance checking
+  const scheduleGameSave = useCallback(() => {
+    // Clear existing timeout if any
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
 
-    const timer = setTimeout(() => {
-      const saveGameToDB = async () => {
-        try {
-          const response = await fetch("/api/game/save", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(gameState),
-          });
-          if (!response.ok) throw new Error("Failed to save game state");
-        } catch (error) {
-          console.error("Error saving game state:", error);
+    const now = Date.now();
+    const timeSinceLastSave = now - lastSaveRef.current;
+    const minTimeBetweenSaves = 2000; // At least 2 seconds between saves
+
+    // If we don't need to save and haven't waited long enough, skip
+    if (!needsSaveRef.current && timeSinceLastSave < minTimeBetweenSaves) {
+      return;
+    }
+
+    // Calculate delay based on importance
+    const delay = needsSaveRef.current ? 300 : 5000;
+
+    setIsSavePending(true);
+    saveTimeoutRef.current = setTimeout(async () => {
+      try {
+        // Validate data before sending
+        if (gameState.money < 0) {
+          console.warn("Invalid money value detected, rejecting save");
+          return;
         }
-      };
+        if (gameState.clicks < 0) {
+          console.warn("Invalid clicks value detected, rejecting save");
+          return;
+        }
+        if (gameState.cps < 0) {
+          console.warn("Invalid CPS value detected, rejecting save");
+          return;
+        }
 
-      saveGameToDB();
-    }, 500);
+        const response = await fetch("/api/game/save", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(gameState),
+        });
 
-    return () => clearTimeout(timer);
-  }, [gameState, isLoading]);
+        if (response.status === 401) {
+          // Session expired
+          console.error("Session expired, redirecting to login");
+          window.location.href = "/auth/login";
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error(`Save failed with status ${response.status}`);
+        }
+
+        lastSaveRef.current = Date.now();
+        needsSaveRef.current = false;
+        setIsSavePending(false);
+        console.log("Game saved successfully");
+      } catch (error) {
+        console.error("Error saving game state:", error);
+        setIsSavePending(false);
+      }
+    }, delay);
+  }, [gameState]);
+
+  // Force immediate save (called by manual save button)
+  const forceGameSave = useCallback(() => {
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    setIsSavePending(true);
+    saveTimeoutRef.current = setTimeout(async () => {
+      try {
+        // Validate data before sending
+        if (gameState.money < 0) {
+          console.warn("Invalid money value detected, rejecting save");
+          return;
+        }
+        if (gameState.clicks < 0) {
+          console.warn("Invalid clicks value detected, rejecting save");
+          return;
+        }
+        if (gameState.cps < 0) {
+          console.warn("Invalid CPS value detected, rejecting save");
+          return;
+        }
+
+        const response = await fetch("/api/game/save", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(gameState),
+        });
+
+        if (response.status === 401) {
+          console.error("Session expired, redirecting to login");
+          window.location.href = "/auth/login";
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error(`Save failed with status ${response.status}`);
+        }
+
+        lastSaveRef.current = Date.now();
+        needsSaveRef.current = false;
+        setIsSavePending(false);
+        console.log("Game saved successfully (manual save)");
+      } catch (error) {
+        console.error("Error saving game state:", error);
+        setIsSavePending(false);
+      }
+    }, 100); // Minimal delay for manual saves
+  }, [gameState]);
 
   // Passive income - optimized with requestAnimationFrame
   useEffect(() => {
@@ -198,23 +291,27 @@ export default function GameClient() {
   }, [gameState.cps]);
 
   const handlePokemonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    setClickEffect({ x, y, id: Math.random().toString() });
-    setTimeout(() => setClickEffect(null), 700);
+    try {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      setClickEffect({ x, y, id: Math.random().toString() });
+      setTimeout(() => setClickEffect(null), 700);
 
-    // Calcular total click damage (1 + bonus from upgrades)
-    const totalClickBonus = gameState.upgrades
-      .filter((u) => u.count > 0 && (u.clickBonus || 0) > 0)
-      .reduce((sum, u) => sum + (u.clickBonus || 0) * u.count, 0);
-    const totalClickDamage = 1 + totalClickBonus;
+      // Calcular total click damage (1 + bonus from upgrades)
+      const totalClickBonus = gameState.upgrades
+        .filter((u) => u.count > 0 && (u.clickBonus || 0) > 0)
+        .reduce((sum, u) => sum + (u.clickBonus || 0) * u.count, 0);
+      const totalClickDamage = 1 + totalClickBonus;
 
-    setGameState((prev) => ({
-      ...prev,
-      money: prev.money + totalClickDamage,
-      clicks: prev.clicks + totalClickDamage,
-    }));
+      setGameState((prev) => ({
+        ...prev,
+        money: prev.money + totalClickDamage,
+        clicks: prev.clicks + totalClickDamage,
+      }));
+    } catch (error) {
+      console.error("Click handler error:", error);
+    }
   };
 
   const buyUpgrade = (upgradeId: string) => {
@@ -309,6 +406,8 @@ export default function GameClient() {
         userName={session?.user?.name || "Jugador"}
         money={gameState.money}
         onSettingsClick={() => setSettingsOpen(true)}
+        onForceSave={forceGameSave}
+        isSavePending={isSavePending}
       />
 
       <div className={styles.mainLayout}>

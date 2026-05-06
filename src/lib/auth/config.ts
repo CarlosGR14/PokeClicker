@@ -69,5 +69,25 @@ export const authConfig: NextAuthOptions = {
       }
       return session;
     },
+    async redirect({ url, baseUrl }) {
+      // Si es una URL relativa
+      if (url.startsWith("/")) {
+        // Evitar bucles: no redirigir a login si ya estamos en login
+        if (url === "/auth/login" || url === "/auth/register") {
+          return url;
+        }
+        return `${baseUrl}${url}`;
+      }
+      // Si es una URL absoluta del mismo host, úsala
+      try {
+        if (new URL(url).origin === new URL(baseUrl).origin) {
+          return url;
+        }
+      } catch {
+        // URL inválida, ignorar
+      }
+      // Por defecto, vuelve a la página del juego
+      return `${baseUrl}/game`;
+    },
   },
 };

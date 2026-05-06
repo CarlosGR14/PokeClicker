@@ -24,9 +24,14 @@ export default function ClickerSection({
   const [isWiggling, setIsWiggling] = useState(false);
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    setIsWiggling(true);
-    setTimeout(() => setIsWiggling(false), 500);
-    onPokeballClick(e);
+    try {
+      setIsWiggling(true);
+      setTimeout(() => setIsWiggling(false), 500);
+      onPokeballClick(e);
+    } catch (error) {
+      // Silenciar errores de pointer capture
+      console.debug("Click handler error:", error);
+    }
   };
 
   return (

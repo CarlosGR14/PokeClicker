@@ -5,12 +5,16 @@ interface Props {
   userName: string;
   money: number | undefined;
   onSettingsClick?: () => void;
+  onForceSave?: () => void;
+  isSavePending?: boolean;
 }
 
 export default function GameHeader({
   userName,
   money = 0,
   onSettingsClick,
+  onForceSave,
+  isSavePending,
 }: Props) {
   const handleLogout = async () => {
     await signOut({ callbackUrl: "/auth/login" });
@@ -45,6 +49,16 @@ export default function GameHeader({
           type="button"
         >
           ⚙️
+        </button>
+        <button
+          className={styles.headerBtn}
+          aria-label="Guardar juego"
+          onClick={onForceSave}
+          type="button"
+          title={isSavePending ? "Guardando..." : "Guardar juego ahora"}
+          disabled={isSavePending}
+        >
+          {isSavePending ? "💾..." : "💾"}
         </button>
         <button
           className={styles.headerBtn}

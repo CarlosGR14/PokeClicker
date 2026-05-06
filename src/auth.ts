@@ -27,7 +27,7 @@ declare module "next-auth/jwt" {
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
-  useSecureCookies: false, // Cambiar a false en desarrollo
+  useSecureCookies: process.env.NEXTAUTH_URL?.startsWith("https") ?? false,
 
   providers: [
     CredentialsProvider({
@@ -111,6 +111,27 @@ export const authOptions: NextAuthOptions = {
         session.user.role = token.role as string;
       }
       return session;
+    },
+
+    async redirect({ url, baseUrl }) {
+      // Si es una URL relativa
+      if (url.startsWith("/")) {
+        // Evitar bucles: no redirigir a login si ya estamos en login
+        if (url === "/auth/login" || url === "/auth/register") {
+          return url;
+        }
+        return `${baseUrl}${url}`;
+      }
+      // Si es una URL absoluta del mismo host, úsala
+      try {
+        if (new URL(url).origin === new URL(baseUrl).origin) {
+          return url;
+        }
+      } catch {
+        // URL inválida, ignorar
+      }
+      // Por defecto, vuelve a la página del juego
+      return `${baseUrl}/game`;
     },
   },
 };
