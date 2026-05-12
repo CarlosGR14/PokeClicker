@@ -55,6 +55,11 @@ export default function Expositor({
                   >
                     {pokemon.rarity.charAt(0).toUpperCase()}
                   </div>
+                  {pokemon.cantidad && pokemon.cantidad > 1 && (
+                    <div className={styles.displaySlotCantidad}>
+                      ×{pokemon.cantidad}
+                    </div>
+                  )}
                 </>
               ) : (
                 <span className={styles.displaySlotPlaceholder}>+</span>

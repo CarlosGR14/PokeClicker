@@ -38,6 +38,10 @@ export default function GameClient() {
   const [gameState, setGameState] = useState<GameState>(getDefaultGameState);
   const [isLoading, setIsLoading] = useState(true);
   const [isSavePending, setIsSavePending] = useState(false);
+  const [pricingConfig, setPricingConfig] = useState<{
+    multiplicador_costo: number;
+  }>({ multiplicador_costo: 1.15 });
+  const [priceBaseMap, setPriceBaseMap] = useState<Record<string, number>>({});
   const lastSaveRef = useRef<number>(0);
   const needsSaveRef = useRef<boolean>(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -95,10 +99,36 @@ export default function GameClient() {
     const loadGameFromDB = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch("/api/game/state");
-        if (!response.ok) throw new Error("Failed to load game state");
 
-        const data: GameState = await response.json();
+        // Cargar estado del juego y precios en paralelo
+        const [gameResponse, pricesResponse] = await Promise.all([
+          fetch("/api/game/state", { credentials: "include" }),
+          fetch("/api/game/prices", { credentials: "include" }),
+        ]);
+
+        if (!gameResponse.ok) {
+          const errorData = await gameResponse.json().catch(() => ({}));
+          throw new Error(
+            `Failed to load game state: ${gameResponse.status} ${JSON.stringify(errorData)}`,
+          );
+        }
+        if (!pricesResponse.ok) {
+          const errorData = await pricesResponse.json().catch(() => ({}));
+          throw new Error(
+            `Failed to load prices: ${pricesResponse.status} ${JSON.stringify(errorData)}`,
+          );
+        }
+
+        const data: GameState = await gameResponse.json();
+        const pricesData = await pricesResponse.json();
+
+        // Almacenar precios base para cálculos posteriores
+        const priceMap: Record<string, number> = {};
+        pricesData.prices.forEach((price: any) => {
+          priceMap[price.nombre] = price.precio_base;
+        });
+        setPriceBaseMap(priceMap);
+        setPricingConfig(pricesData.config);
 
         // Merge BD upgrades with INITIAL_UPGRADES to ensure all upgrades are present
         const mergedUpgrades = INITIAL_UPGRADES.map((initialUpgrade) => {
@@ -188,6 +218,7 @@ export default function GameClient() {
 
         const response = await fetch("/api/game/save", {
           method: "POST",
+          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(gameState),
         });
@@ -239,6 +270,7 @@ export default function GameClient() {
 
         const response = await fetch("/api/game/save", {
           method: "POST",
+          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(gameState),
         });
@@ -318,14 +350,20 @@ export default function GameClient() {
     setGameState((prev) => {
       const upgrade = prev.upgrades.find((u) => u.id === upgradeId);
       if (!upgrade || prev.money < upgrade.cost) return prev;
+
+      // Calcular el próximo precio dinámicamente
+      const priceBase = priceBaseMap[upgrade.name] || upgrade.cost;
+      const nextCount = upgrade.count + 1;
+      const nextCost = Math.floor(
+        priceBase * Math.pow(pricingConfig.multiplicador_costo, nextCount),
+      );
+
       return {
         ...prev,
         money: prev.money - upgrade.cost,
         cps: prev.cps + upgrade.cpsBonus,
         upgrades: prev.upgrades.map((u) =>
-          u.id === upgradeId
-            ? { ...u, count: u.count + 1, cost: Math.floor(u.cost * 1.15) }
-            : u,
+          u.id === upgradeId ? { ...u, count: nextCount, cost: nextCost } : u,
         ),
       };
     });
@@ -337,15 +375,59 @@ export default function GameClient() {
     setIsOpening(packId);
     setGameState((prev) => ({ ...prev, money: prev.money - pack.cost }));
     const rarity = rollRarity(packId);
-    const pokemonId = pickPokemonId(rarity);
+
+    // Función para regenerar Pokémon si ya existe
+    const getNewPokemon = async (): Promise<{
+      pokemon: Awaited<ReturnType<typeof getPokemonById>>;
+      pokemonId: number;
+    } | null> => {
+      let attempts = 0;
+      const maxAttempts = 50; // Evitar loop infinito
+
+      while (attempts < maxAttempts) {
+        const pokemonId = pickPokemonId(rarity);
+
+        // Verificar si ya existe en la colección del usuario
+        const alreadyOwned = gameState.collectedPokemon.some(
+          (p) => parseInt(p.id.split("_")[0]) === pokemonId,
+        );
+
+        if (!alreadyOwned) {
+          try {
+            const pokemon = await getPokemonById(pokemonId);
+            return { pokemon, pokemonId };
+          } catch (error) {
+            console.error(`Error fetching Pokémon ${pokemonId}:`, error);
+            attempts++;
+            continue;
+          }
+        }
+
+        attempts++;
+      }
+
+      return null;
+    };
+
     try {
-      const pokemon = await getPokemonById(pokemonId);
+      const result = await getNewPokemon();
+
+      if (!result) {
+        console.warn("Could not find a new Pokémon after 50 attempts");
+        setGameState((prev) => ({ ...prev, money: prev.money + pack.cost }));
+        setIsOpening(null);
+        return;
+      }
+
+      const { pokemon, pokemonId } = result;
       const captured: CollectedPokemon = {
         id: makeCaptureId(pokemonId),
         name: pokemon.name,
         image: pokemon.image,
         rarity,
+        pokeapi_id: pokemonId, // Guardar ID para validación
       };
+
       setGameState((prev) => ({
         ...prev,
         collectedPokemon: [...(prev.collectedPokemon ?? []), captured],

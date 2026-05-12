@@ -49,6 +49,26 @@ export async function POST(request: NextRequest) {
 
     console.log("Usuario creado:", user.id);
 
+    // Obtener todos los PrecioItem con tipo "mejora" para inicializar
+    const mejorasPrecios = await prisma.precioItem.findMany({
+      where: { tipo: "mejora" },
+    });
+
+    // Crear mejoras por defecto para el usuario con precio inicial
+    if (mejorasPrecios.length > 0) {
+      await prisma.mejora.createMany({
+        data: mejorasPrecios.map((precioItem) => ({
+          usuario_id: user.id,
+          precio_item_id: precioItem.id,
+          cantidad: 0,
+          precio_pagado: precioItem.precio_base,
+        })),
+      });
+      console.log(
+        `${mejorasPrecios.length} mejoras inicializadas para usuario ${user.id}`,
+      );
+    }
+
     return NextResponse.json(
       {
         success: true,

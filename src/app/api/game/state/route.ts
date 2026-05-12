@@ -19,7 +19,6 @@ export async function GET() {
         pokemons: {
           orderBy: { fecha_captura: "desc" },
         },
-        mejoras: true,
       },
     });
 
@@ -29,6 +28,19 @@ export async function GET() {
         { status: 404 },
       );
     }
+
+    // Obtener mejoras del usuario con precios actuales
+    const mejoras = await prisma.mejora.findMany({
+      where: { usuario_id: usuario.id },
+      include: { precioItem: true },
+    });
+
+    // Obtener configuración global (multiplicador)
+    const config = await prisma.configGlobal.findUnique({
+      where: { id: 1 },
+    });
+
+    const multiplicador = config?.multiplicador_costo || 1.15;
 
     // Mapear datos a GameState
     // Asegurar que money, clicks y cps nunca sean undefined
@@ -42,17 +54,33 @@ export async function GET() {
       "Life Orb": "lifeorb",
     };
 
-    const upgrades = usuario.mejoras.map((mejora) => {
-      const cpsBonus = mejora.valor_multiplicador || 0;
-      const clickBonus = mejora.click_bonus || 0;
+    // Obtener todos los precios actuales de una vez (optimización)
+    const preciosItems = await prisma.precioItem.findMany();
+    const preciosMap = new Map(
+      preciosItems.map((p) => [p.nombre, p.precio_base]),
+    );
+
+    const upgrades = mejoras.map((mejora) => {
+      const cpsBonus = mejora.precioItem?.cps_bonus || 0;
+      const clickBonus = mejora.precioItem?.click_bonus || 0;
+      const cantidad = mejora.cantidad || 0;
+
+      // Usar precio_base actual de PrecioItem
+      const precioBase = mejora.precioItem?.precio_base || 0;
+
+      // Calcular precio dinámico: precio_base * multiplicador^cantidad
+      const precioDinamico = Math.floor(
+        precioBase * Math.pow(multiplicador, cantidad),
+      );
 
       return {
         id:
-          UPGRADE_ID_MAP[mejora.nombre_item] ||
-          mejora.nombre_item.toLowerCase().replace(/\s+/g, ""),
-        name: mejora.nombre_item,
-        cost: mejora.precio_actual || 0,
-        count: mejora.cantidad || 0,
+          UPGRADE_ID_MAP[mejora.precioItem?.nombre || ""] ||
+          mejora.precioItem?.nombre?.toLowerCase().replace(/\s+/g, "") ||
+          "",
+        name: mejora.precioItem?.nombre || "",
+        cost: precioDinamico,
+        count: cantidad,
         cpsBonus,
         clickBonus: clickBonus > 0 ? clickBonus : undefined,
         description:
@@ -77,8 +105,12 @@ export async function GET() {
         name: "", // Se llena en frontend con PokeAPI
         image: "", // Se llena en frontend con PokeAPI
         rarity: getRarityByPokemonId(pokemon.pokeapi_id),
+        cantidad: pokemon.cantidad,
         indiceSlot: pokemon.indiceSlot,
-        expuesto: pokemon.expuesto,
+        expuesto:
+          pokemon.indiceSlot !== null &&
+          pokemon.indiceSlot >= 0 &&
+          pokemon.indiceSlot < 4,
         pokeapi_id: pokemon.pokeapi_id,
       })),
     };

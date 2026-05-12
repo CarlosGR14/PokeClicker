@@ -457,6 +457,19 @@ button:focus-visible {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
+.displaySlotCantidad {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  font-weight: 700;
+  font-size: clamp(0.65rem, 1.5vw, 0.85rem);
+  padding: 2px 6px;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
 .rarityCommon {
   background-color: oklch(65% 0.08 145);
 }
@@ -679,6 +692,16 @@ button:focus-visible {
   color: var(--text-muted);
   text-transform: capitalize;
   font-weight: 600;
+}
+
+.pokedexCantidad {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #ffffff;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 4px;
 }
 
 .pokemonImage {

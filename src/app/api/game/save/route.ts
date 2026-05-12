@@ -99,19 +99,23 @@ export async function POST(request: NextRequest) {
       data: {
         monedas: gameState.money,
         clicks: BigInt(Math.floor(gameState.clicks)),
-        cps: gameState.cps,
         ultima_actualizacion: new Date(),
       },
     });
 
-    // Actualizar Mejoras (upgrades) - BATCH operations
+    // Actualizar Mejoras (upgrades) - Vincular a PrecioItem
     const mejorasExistentes = await prisma.mejora.findMany({
       where: { usuario_id: usuario.id },
+      include: { precioItem: true },
     });
 
     const mejorasMap = new Map(
-      mejorasExistentes.map((m) => [m.nombre_item, m.id]),
+      mejorasExistentes.map((m) => [m.precioItem.nombre, m.id]),
     );
+
+    // Obtener todos los PrecioItems para mapeo
+    const precioItems = await prisma.precioItem.findMany();
+    const precioItemMap = new Map(precioItems.map((p) => [p.nombre, p]));
 
     // Separar upgrades en updates y creates
     const upgradesToUpdate = [];
@@ -119,11 +123,16 @@ export async function POST(request: NextRequest) {
 
     for (const upgrade of gameState.upgrades) {
       const nombre = upgrade.name;
+      const precioItem = precioItemMap.get(nombre);
+
+      if (!precioItem) {
+        console.warn(`PrecioItem not found for upgrade: ${nombre}`);
+        continue;
+      }
+
       const data = {
         cantidad: upgrade.count,
-        precio_actual: upgrade.cost,
-        valor_multiplicador: upgrade.cpsBonus,
-        click_bonus: upgrade.clickBonus || 0,
+        precio_pagado: upgrade.cost,
       };
 
       if (mejorasMap.has(nombre)) {
@@ -134,8 +143,9 @@ export async function POST(request: NextRequest) {
       } else {
         upgradesToCreate.push({
           usuario_id: usuario.id,
-          nombre_item: nombre,
-          ...data,
+          precio_item_id: precioItem.id,
+          cantidad: upgrade.count,
+          precio_pagado: upgrade.cost,
         });
       }
     }
@@ -184,37 +194,45 @@ export async function POST(request: NextRequest) {
       // Preparar operaciones de upsert
       const upsertPromises = gameState.collectedPokemon
         .map((pokemon: any) => {
-          // Extract pokemonId from format "pokemonId_timestamp" or just "pokemonId"
-          const match = pokemon.id.match(/^(\d+)/);
+          // Extract pokemonId from format "pokemonId_timestamp" o solo "pokemonId"
+          const match = pokemon.id.match(/^(\d+)(?:_(\d+))?$/);
           const pokeapiId = match ? parseInt(match[1]) : null;
+          const timestamp = match ? match[2] : null; // Timestamp si existe = es NUEVO
 
           if (!pokeapiId) {
             console.warn(`Invalid Pokemon ID format: ${pokemon.id}`);
             return null;
           }
 
-          const isExposed =
-            pokemon.indiceSlot !== null &&
-            pokemon.indiceSlot !== undefined &&
-            pokemon.indiceSlot >= 0 &&
-            pokemon.indiceSlot < 4;
-
           if (existingMap.has(pokeapiId)) {
-            // Actualizar
+            // Actualizar: solo incrementar si es NUEVO (tiene timestamp)
+            const data: any = {
+              indiceSlot: pokemon.indiceSlot ?? null,
+            };
+
+            // Solo incrementar cantidad si tiene timestamp (es un capture nuevo)
+            if (timestamp) {
+              data.cantidad = { increment: 1 };
+            }
+
             return prisma.pokemon.update({
               where: { id: existingMap.get(pokeapiId)! },
-              data: {
-                indiceSlot: pokemon.indiceSlot ?? null,
-                expuesto: isExposed,
-              },
+              data,
             });
           } else {
-            // Crear
+            // Crear (solo si tiene timestamp, es un capture nuevo)
+            if (!timestamp) {
+              console.warn(
+                `Pokemon ${pokeapiId} no existe y no tiene timestamp, ignorando`,
+              );
+              return null;
+            }
+
             return prisma.pokemon.create({
               data: {
                 usuario_id: usuario.id,
                 pokeapi_id: pokeapiId,
-                expuesto: isExposed,
+                cantidad: 1,
                 indiceSlot: pokemon.indiceSlot ?? null,
               },
             });

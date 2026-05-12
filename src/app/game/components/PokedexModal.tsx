@@ -55,6 +55,9 @@ export default function PokedexModal({ open, pokemon, onClose }: Props) {
                   />
                   <div className={styles.pokedexName}>{p.name}</div>
                   <div className={styles.pokedexRarity}>{p.rarity}</div>
+                  <div className={styles.pokedexCantidad}>
+                    ×{p.cantidad ?? 1}
+                  </div>
                 </div>
               ))}
             </div>

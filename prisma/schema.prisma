@@ -2,11 +2,28 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output = "./generated"
 }
 
 datasource db {
   provider = "mysql"
+}
+
+enum Tema {
+  light
+  dark
+  system
+}
+
+enum UserRole {
+  jugador
+  admin
+}
+
+enum TipoPrecioItem {
+  mejora
+  sobre
 }
 
 model Usuario {
@@ -16,16 +33,14 @@ model Usuario {
   password        String
   
   // Stats del juego
-  monedas         Int       @default(0)
-  clicks          BigInt    @default(0)           // Total histórico de clicks
-  cps             Float     @default(0)           // Clicks por segundo (ingreso pasivo)
-  multiplicador   Float     @default(1.0)
+  monedas         Int       @default(0)           @db.UnsignedInt
+  clicks          BigInt    @default(0)          // Total histórico de clicks
   
   // Preferencias
-  tema            String    @default("system")    // light, dark, o system
+  tema            Tema      @default(system)
   
   // Metadata
-  role            String    @default("jugador")
+  role            UserRole  @default(jugador)
   fecha_creacion  DateTime  @default(now())
   ultima_actualizacion DateTime @default(now()) @updatedAt
   
@@ -33,6 +48,7 @@ model Usuario {
   pokemons        Pokemon[]
   mejoras         Mejora[]
 
+  @@index([email])
   @@map("usuario")
 }
 
@@ -41,22 +57,53 @@ model Pokemon {
   usuario_id      Int
   usuario         Usuario   @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
   pokeapi_id      Int
+  cantidad        Int       @default(1)           @db.UnsignedSmallInt
   fecha_captura   DateTime  @default(now())
-  expuesto        Boolean   @default(false)
-  indiceSlot      Int?                            // 0-3 si está en expositor, null si no
+  indiceSlot      Int?                            @db.UnsignedTinyInt // 0-3 si está en expositor, null si no
 
+  @@unique([usuario_id, pokeapi_id])
+  @@index([usuario_id])
+  @@index([pokeapi_id])
   @@map("pokemon")
 }
 
 model Mejora {
-  id                    Int       @id @default(autoincrement())
-  usuario_id            Int
-  usuario               Usuario   @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
-  nombre_item           String
-  cantidad              Int       @default(0)     // Cuántas de este upgrade compró
-  precio_actual         Int
-  valor_multiplicador   Float
-  click_bonus           Float     @default(0)     // Bonificación de daño por click
+  id              Int       @id @default(autoincrement())
+  usuario_id      Int
+  usuario         Usuario   @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+  
+  precio_item_id  Int
+  precioItem      PrecioItem @relation(fields: [precio_item_id], references: [id])
+  
+  cantidad        Int       @default(1)           @db.UnsignedSmallInt
+  precio_pagado   Int       @db.UnsignedInt     // Snapshot del precio cuando se compró
+  fecha_compra    DateTime  @default(now())
 
+  @@unique([usuario_id, precio_item_id])
+  @@index([usuario_id])
   @@map("mejora")
+}
+
+model PrecioItem {
+  id              Int       @id @default(autoincrement())
+  nombre          String    @unique  @db.Char(64)
+  tipo            TipoPrecioItem
+  precio_base     Int       @db.UnsignedInt
+  cps_bonus       Float     @default(0)
+  click_bonus     Float     @default(0)
+  activo          Boolean   @default(true)      // Soft delete para histórico
+  fecha_creacion  DateTime  @default(now())
+  
+  mejoras         Mejora[]
+
+  @@index([tipo])
+  @@map("precio_item")
+}
+
+model ConfigGlobal {
+  id                  Int     @id @default(1)             // Solo una fila
+  multiplicador_costo Float   @default(1.15)              // Multiplicador de precio por compra
+  ultima_actualizacion DateTime @default(now()) @updatedAt
+
+  @@map("config_global")
 }

@@ -1,47 +1,160 @@
 "use client";
 
-import { signOut } from "next-auth/react";
-import styles from "../game/game.module.css";
+import { useEffect, useState } from "react";
+import styles from "./admin.module.css";
+
+interface DashboardStats {
+  totalUsers: number;
+  totalCoins: number;
+  totalPokemon: number;
+  recentUsers: Array<{
+    id: number;
+    email: string;
+    nombre: string;
+    fecha_creacion: string;
+  }>;
+}
 
 export default function AdminPage() {
-  const handleLogout = async () => {
-    await signOut({ callbackUrl: "/auth/login" });
-  };
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch("/api/admin/stats", {
+          credentials: "include",
+        });
+        if (!response.ok) throw new Error("Failed to fetch stats");
+
+        const data = await response.json();
+        setStats(data);
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching dashboard stats:", err);
+        setError("Error al cargar estadísticas");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   return (
-    <div className={styles.container}>
-      <header className={styles.header}>
-        <div className={styles.headerLeft}>
-          <h1 className={styles.playerName}>Dashboard Admin</h1>
+    <>
+      <div className={styles.pageHeader}>
+        <div>
+          <h1 className={styles.pageTitle}>📊 Resumen General</h1>
+          <p className={styles.pageDescription}>
+            Estado actual del juego y actividad de usuarios
+          </p>
         </div>
-        <div className={styles.headerRight}>
-          <button
-            className={styles.headerBtn}
-            aria-label="Cerrar sesión"
-            onClick={handleLogout}
-            type="button"
-          >
-            🚪
-          </button>
-        </div>
-      </header>
+      </div>
 
-      <main className={styles.main}>
-        <div style={{ padding: "2rem", textAlign: "center" }}>
-          <h2>Bienvenido al Panel de Administración</h2>
-          <p>Aquí irán las funcionalidades de administrador</p>
+      {loading ? (
+        <p style={{ padding: "20px", color: "oklch(50% 0.008 20)" }}>
+          ⏳ Cargando datos...
+        </p>
+      ) : error ? (
+        <p
+          style={{
+            color: "oklch(50% 0.16 20)",
+            padding: "20px",
+            fontWeight: 600,
+          }}
+        >
+          ❌ {error}
+        </p>
+      ) : (
+        <>
+          {/* KPI Grid */}
+          <div className={styles.kpiGrid}>
+            <div className={styles.kpiCard}>
+              <div className={styles.kpiLabel}>👥 Usuarios Totales</div>
+              <div className={styles.kpiValue}>
+                {stats?.totalUsers.toLocaleString()}
+              </div>
+              <div className={styles.kpiSubtext}>Jugadores registrados</div>
+            </div>
 
-          <div style={{ marginTop: "2rem", textAlign: "left" }}>
-            <h3>Funcionalidades planeadas:</h3>
-            <ul>
-              <li>Gestionar usuarios</li>
-              <li>Ver estadísticas del juego</li>
-              <li>Configurar parámetros del juego</li>
-              <li>Ver reportes</li>
-            </ul>
+            <div className={styles.kpiCard}>
+              <div className={styles.kpiLabel}>💰 Monedas en Circulación</div>
+              <div className={styles.kpiValue}>
+                {(stats?.totalCoins ?? 0) > 1000000
+                  ? ((stats?.totalCoins ?? 0) / 1000000).toFixed(1) + "M"
+                  : (stats?.totalCoins ?? 0).toLocaleString()}
+              </div>
+              <div className={styles.kpiSubtext}>Total acumulado</div>
+            </div>
+
+            <div className={styles.kpiCard}>
+              <div className={styles.kpiLabel}>🎲 Pokémon Capturados</div>
+              <div className={styles.kpiValue}>
+                {stats?.totalPokemon.toLocaleString()}
+              </div>
+              <div className={styles.kpiSubtext}>Colección total</div>
+            </div>
+
+            <div className={styles.kpiCard}>
+              <div className={styles.kpiLabel}>📈 Tasa de Actividad</div>
+              <div className={styles.kpiValue}>87%</div>
+              <div className={styles.kpiSubtext}>Usuarios activos hoy</div>
+            </div>
           </div>
-        </div>
-      </main>
-    </div>
+
+          {/* Recent Users Table */}
+          <div>
+            <h2
+              style={{
+                fontSize: "1.25rem",
+                marginBottom: "16px",
+                color: "oklch(52% 0.18 15)",
+                fontWeight: 700,
+              }}
+            >
+              📝 Registros Recientes
+            </h2>
+            <div className={styles.tableContainer}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Usuario</th>
+                    <th>Email</th>
+                    <th>Fecha de Registro</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stats?.recentUsers.map((user) => (
+                    <tr key={user.id}>
+                      <td>{user.nombre}</td>
+                      <td>{user.email}</td>
+                      <td>
+                        {new Date(user.fecha_creacion).toLocaleDateString(
+                          "es-ES",
+                          {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          },
+                        )}
+                      </td>
+                      <td>
+                        <button className={styles.buttonSecondary}>Ver</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      )}
+    </>
   );
 }

@@ -65,8 +65,8 @@ export default function ClickerSection({
       </button>
 
       <div className={styles.multiplierContainer}>
-        <span className={styles.multiplierLabel}>Multiplicador:</span>
-        <span className={styles.multiplierValue}>{(cps ?? 0).toFixed(2)}x</span>
+        <span className={styles.multiplierLabel}>Dinero por segundo:</span>
+        <span className={styles.multiplierValue}>{(cps ?? 0).toFixed(2)}</span>
       </div>
     </div>
   );

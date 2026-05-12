@@ -21,6 +21,7 @@ export interface CollectedPokemon {
   name: string;
   image: string;
   rarity: "common" | "rare" | "epic" | "legendary";
+  cantidad?: number; // Cantidad de este Pokémon
   indiceSlot?: number | null; // 0-3 if displayed, null otherwise
   expuesto?: boolean; // Whether pokemon is displayed in expositor
   pokeapi_id?: number; // Adicional para compatibilidad
