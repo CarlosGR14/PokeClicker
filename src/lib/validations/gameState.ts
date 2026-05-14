@@ -42,7 +42,7 @@ export const GameStateSchema = z.object({
         ), // Format: pokemonId_timestamp
       name: z.string().optional(), // From client, not stored
       image: z.string().optional(), // From client, not stored
-      rarity: z.enum(["common", "rare", "epic", "legendary"]).optional(), // From client, not stored
+      rarity: z.enum(["common", "epic", "legendary"]).optional(), // From client, not stored
       indiceSlot: z.number().min(0).max(3).nullable().optional(),
     }),
   ),

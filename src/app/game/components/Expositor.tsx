@@ -19,7 +19,6 @@ export default function Expositor({
 }: Props) {
   const rarityColors: Record<string, string> = {
     common: styles.rarityCommon,
-    rare: styles.rarityRare,
     epic: styles.rarityEpic,
     legendary: styles.rarityLegendary,
   };

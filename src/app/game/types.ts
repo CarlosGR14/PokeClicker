@@ -20,7 +20,7 @@ export interface CollectedPokemon {
   id: string;
   name: string;
   image: string;
-  rarity: "common" | "rare" | "epic" | "legendary";
+  rarity: "common" | "epic" | "legendary";
   cantidad?: number; // Cantidad de este Pokémon
   indiceSlot?: number | null; // 0-3 if displayed, null otherwise
   expuesto?: boolean; // Whether pokemon is displayed in expositor
@@ -34,7 +34,6 @@ export interface Pack {
   emoji: string;
   probabilities: {
     common?: number;
-    rare?: number;
     epic?: number;
     legendary?: number;
   };
@@ -108,23 +107,126 @@ export const PACKS: Pack[] = [
     name: "Sobre Básico",
     cost: 100,
     emoji: "📦",
-    probabilities: { common: 80, rare: 18, legendary: 2 },
+    probabilities: { common: 85, epic: 13, legendary: 2 },
   },
   {
     id: "epic",
     name: "Sobre Épico",
     cost: 1000,
     emoji: "✨",
-    probabilities: { common: 30, epic: 50, legendary: 20 },
+    probabilities: { common: 10, epic: 70, legendary: 20 },
   },
 ];
 
-export const LEGENDARY_IDS = [
-  144, 145, 146, 150, 151, 249, 250, 382, 383, 384, 487,
-];
-export const EPIC_IDS = [
-  6, 9, 65, 94, 130, 143, 149, 248, 373, 376, 445, 448, 131,
-];
+// Known legendary Pokemon IDs for fallback classification
+// Used when is_legendary flag is not reliable in PokeAPI
+const KNOWN_LEGENDARY_IDS = new Set([
+  // Gen 1
+  144, 145, 146, 150, 151,
+  // Gen 2
+  249, 250, 251,
+  // Gen 3
+  377, 378, 379, 380, 381, 382, 383, 384, 385,
+  // Gen 4
+  480, 481, 482, 483, 484, 485, 486, 487, 488, 489, 490, 491, 492, 493,
+  // Gen 5
+  638, 639, 640, 641, 642, 643, 644, 645, 646, 647, 648, 649,
+  // Gen 6
+  716, 717, 718, 719, 720, 721,
+  // Gen 7
+  785, 786, 787, 788, 789, 790, 791, 792, 800, 801, 802,
+  // Gen 8
+  888, 889, 890, 891, 892, 893, 894, 895, 896, 897, 898, 899,
+  // Gen 9
+  1000, 1001, 1002, 1003, 1004, 1005, 1006,
+]);
+
+/**
+ * Rarity classification based on PokeAPI data
+ * Priority order:
+ * 1. is_legendary or is_mythical flag
+ * 2. Base stat total >= 600 (pseudo-legendary)
+ * 3. Known legendary from our list (fallback)
+ * 4. High base stat total (520+) OR low capture rate (<50) → epic
+ * 5. Default to common
+ */
+export function classifyRarity(pokemon: any): CollectedPokemon["rarity"] {
+  const id = pokemon.id;
+
+  // Priority 1: Check explicit legendary/mythical flags from PokeAPI
+  if (pokemon.is_legendary === true || pokemon.is_mythical === true) {
+    return "legendary";
+  }
+
+  // Priority 2: Pseudo-legendaries have very high stats (base_stat_total >= 600)
+  const baseStatTotal =
+    pokemon.stats?.reduce(
+      (sum: number, stat: any) => sum + stat.base_stat,
+      0,
+    ) ?? 0;
+  if (baseStatTotal >= 600) {
+    return "legendary";
+  }
+
+  // Priority 3: Check against known legendary list (fallback for PokeAPI inconsistencies)
+  if (KNOWN_LEGENDARY_IDS.has(id)) {
+    return "legendary";
+  }
+
+  // Priority 4: Epic if high stats (520+) OR low capture rate (<50)
+  const captureRate = pokemon.capture_rate ?? 255;
+  if (baseStatTotal >= 520 || captureRate < 50) {
+    return "epic";
+  }
+
+  // Priority 5: Default to common
+  return "common";
+}
+
+// Dynamic pool - will be populated from PokeAPI
+let POKEMON_POOL: Map<"common" | "epic" | "legendary", number[]> | null = null;
+
+export async function initializePokemonPool(): Promise<void> {
+  if (POKEMON_POOL) return; // Already initialized
+
+  POKEMON_POOL = new Map([
+    ["common", []],
+    ["epic", []],
+    ["legendary", []],
+  ]);
+
+  try {
+    // Fetch all pokemon (limit to ~1000 for now)
+    const response = await fetch(
+      "https://pokeapi.co/api/v2/pokemon?limit=1000",
+    );
+    const data = await response.json();
+
+    // Classify each pokemon
+    for (const pokemonRef of data.results) {
+      const id = parseInt(pokemonRef.url.split("/").slice(-2)[0]);
+      const pokemonData = await fetch(pokemonRef.url).then((r) => r.json());
+      const rarity = classifyRarity(pokemonData);
+      POKEMON_POOL!.get(rarity)!.push(id);
+    }
+  } catch (error) {
+    console.error("Failed to initialize Pokemon pool:", error);
+    // Fallback to Gen 1 only if API fails
+    POKEMON_POOL.set(
+      "common",
+      Array.from({ length: 145 }, (_, i) => i + 1),
+    );
+    POKEMON_POOL.set("epic", [6, 9, 65, 94, 130, 131, 143, 149]);
+    POKEMON_POOL.set("legendary", [144, 145, 146, 150, 151]);
+  }
+}
+
+// Fallback to Gen 1 for quick loading
+// Dynamic pool will override these at runtime
+export const LEGENDARY_IDS = [144, 145, 146, 150, 151];
+
+export const EPIC_IDS = [6, 9, 65, 94, 130, 131, 143, 149];
+
 export const COMMON_IDS = Array.from({ length: 151 }, (_, i) => i + 1).filter(
   (id) => !LEGENDARY_IDS.includes(id) && !EPIC_IDS.includes(id),
 );
@@ -139,7 +241,6 @@ export const UPGRADE_ICONS: Record<string, string> = {
 export const RARITY_LABELS: Record<string, string> = {
   legendary: "⭐ LEGENDARIO",
   epic: "💜 ÉPICO",
-  rare: "🟢 RARO",
   common: "⚪ COMÚN",
 };
 
@@ -147,20 +248,29 @@ export function rollRarity(packId: string): CollectedPokemon["rarity"] {
   const roll = Math.random() * 100;
   if (packId === "basic") {
     if (roll < 2) return "legendary";
-    if (roll < 20) return "rare";
+    if (roll < 15) return "epic";
     return "common";
   }
   if (roll < 20) return "legendary";
-  if (roll < 70) return "epic";
+  if (roll < 90) return "epic";
   return "common";
 }
 
 export function pickPokemonId(rarity: CollectedPokemon["rarity"]): number {
+  // Try to use dynamic pool if available
+  if (POKEMON_POOL) {
+    const pool = POKEMON_POOL.get(rarity);
+    if (pool && pool.length > 0) {
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+  }
+
+  // Fallback to hardcoded IDs (Gen 1 only for simplicity)
   if (rarity === "legendary")
     return LEGENDARY_IDS[Math.floor(Math.random() * LEGENDARY_IDS.length)];
   if (rarity === "epic")
     return EPIC_IDS[Math.floor(Math.random() * EPIC_IDS.length)];
-  if (rarity === "rare") return Math.floor(Math.random() * 100) + 152;
+
   return COMMON_IDS[Math.floor(Math.random() * COMMON_IDS.length)];
 }
 
@@ -173,6 +283,185 @@ export function getRarityByPokemonId(
 ): CollectedPokemon["rarity"] {
   if (LEGENDARY_IDS.includes(pokemonId)) return "legendary";
   if (EPIC_IDS.includes(pokemonId)) return "epic";
-  if (pokemonId > 151) return "rare"; // Gen II and beyond
   return "common";
+}
+
+// ============================================
+// AUTOMATIC RARITY DETECTION (using PokeAPI)
+// ============================================
+
+const rarityCache = new Map<number, CollectedPokemon["rarity"]>();
+let isCachingInProgress = false;
+let pendingCacheUpdates = new Set<number>();
+
+/**
+ * Initialize localStorage cache on client side
+ */
+function initializeClientCache(): void {
+  if (typeof window === "undefined") return;
+
+  try {
+    const cached = localStorage.getItem("pokeclicker_rarity_cache");
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      Object.entries(parsed).forEach(([id, rarity]) => {
+        rarityCache.set(Number(id), rarity as CollectedPokemon["rarity"]);
+      });
+    }
+  } catch (error) {
+    console.warn("Failed to load rarity cache from localStorage", error);
+  }
+}
+
+/**
+ * Save cache to localStorage
+ */
+function persistCacheToLocalStorage(): void {
+  if (typeof window === "undefined") return;
+
+  try {
+    const cacheObj: Record<number, CollectedPokemon["rarity"]> = {};
+    rarityCache.forEach((rarity, id) => {
+      cacheObj[id] = rarity;
+    });
+
+    localStorage.setItem("pokeclicker_rarity_cache", JSON.stringify(cacheObj));
+  } catch (error) {
+    console.warn("Failed to persist rarity cache to localStorage", error);
+  }
+}
+
+/**
+ * Get rarity by querying PokeAPI species data
+ * Uses cache to avoid repeated requests
+ * Falls back to sync version if error occurs
+ */
+export async function getRarityByPokemonIdAuto(
+  pokemonId: number,
+): Promise<CollectedPokemon["rarity"]> {
+  // Return cached value if available
+  if (rarityCache.has(pokemonId)) {
+    return rarityCache.get(pokemonId)!;
+  }
+
+  try {
+    // Dynamically import to avoid issues in client-side contexts
+    const { determinePokemonRarity } = await import("@/services/pokeapi");
+    const rarity = await determinePokemonRarity(pokemonId);
+
+    // Cache the result
+    rarityCache.set(pokemonId, rarity);
+    persistCacheToLocalStorage();
+    return rarity;
+  } catch (error) {
+    // Fallback to sync version if API fails
+    console.warn(
+      `Failed to determine rarity for Pokemon ${pokemonId}, using sync version`,
+      error,
+    );
+    const fallbackRarity = getRarityByPokemonId(pokemonId);
+    rarityCache.set(pokemonId, fallbackRarity);
+    persistCacheToLocalStorage();
+    return fallbackRarity;
+  }
+}
+
+/**
+ * Pick a random Pokemon ID based on desired rarity
+ * Uses automatic detection from PokeAPI
+ * More accurate but slower (use async/await)
+ */
+export async function pickPokemonIdAuto(
+  rarity: CollectedPokemon["rarity"],
+): Promise<number> {
+  const maxAttempts = 50;
+  let attempts = 0;
+
+  while (attempts < maxAttempts) {
+    const pokemonId = Math.floor(Math.random() * 1025) + 1;
+    const actualRarity = await getRarityByPokemonIdAuto(pokemonId);
+
+    if (actualRarity === rarity) {
+      return pokemonId;
+    }
+
+    attempts++;
+  }
+
+  // Fallback: use sync version if we can't find one
+  console.warn(
+    `Could not find Pokemon with rarity "${rarity}" in ${maxAttempts} attempts, using sync version`,
+  );
+  return pickPokemonId(rarity);
+}
+
+/**
+ * Background cache warmer: updates cache without blocking
+ * Queues multiple updates and batches them
+ */
+export function warmRarityCache(pokemonIds: number[]): void {
+  if (isCachingInProgress) {
+    // Queue for later
+    pokemonIds.forEach((id) => pendingCacheUpdates.add(id));
+    return;
+  }
+
+  const toUpdate = pokemonIds.filter(
+    (id) => !rarityCache.has(id) && !pendingCacheUpdates.has(id),
+  );
+
+  if (toUpdate.length === 0) return;
+
+  isCachingInProgress = true;
+
+  // Update sequentially with delays to avoid API throttling
+  (async () => {
+    for (const pokemonId of toUpdate) {
+      try {
+        await getRarityByPokemonIdAuto(pokemonId);
+        // Small delay between requests
+        await new Promise((resolve) => setTimeout(resolve, 50));
+      } catch (error) {
+        console.error(`Failed to warm cache for Pokemon ${pokemonId}`, error);
+      }
+    }
+
+    isCachingInProgress = false;
+
+    // Process pending updates if any
+    if (pendingCacheUpdates.size > 0) {
+      const pending = Array.from(pendingCacheUpdates);
+      pendingCacheUpdates.clear();
+      warmRarityCache(pending);
+    }
+  })();
+}
+
+/**
+ * Pre-cache Gen I Pokémon (1-151) on app startup
+ * These are the most common ones
+ */
+export async function preWarmGen1Cache(): Promise<void> {
+  const gen1Ids = Array.from({ length: 151 }, (_, i) => i + 1);
+  const notCached = gen1Ids.filter((id) => !rarityCache.has(id));
+
+  if (notCached.length > 0) {
+    // Don't await - just queue it
+    warmRarityCache(notCached);
+  }
+}
+
+/**
+ * Clear the rarity cache (useful for testing or manual refresh)
+ */
+export function clearRarityCache(): void {
+  rarityCache.clear();
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("pokeclicker_rarity_cache");
+  }
+}
+
+// Initialize cache when module loads on client side
+if (typeof window !== "undefined") {
+  initializeClientCache();
 }

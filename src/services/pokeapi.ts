@@ -164,16 +164,15 @@ export async function getPokemonSpecies(
  */
 export async function determinePokemonRarity(
   pokemonId: number,
-): Promise<"common" | "rare" | "epic" | "legendary"> {
+): Promise<"common" | "epic" | "legendary"> {
   try {
     const species = await getPokemonSpecies(pokemonId);
 
     if (species.isMythical) return "legendary";
     if (species.isLegendary) return "epic";
-    if (species.isBaby) return "rare";
 
-    // Random chance for common/rare
-    return Math.random() > 0.8 ? "rare" : "common";
+    // Random chance for common/epic
+    return Math.random() > 0.8 ? "epic" : "common";
   } catch {
     return "common";
   }

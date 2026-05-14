@@ -14,7 +14,9 @@
     "db:reset": "prisma migrate reset --force --config prisma/prisma.config.ts",
     "db:status": "prisma migrate status --config prisma/prisma.config.ts",
     "db:studio": "prisma studio --config prisma/prisma.config.ts",
-    "db:validate": "prisma validate --config prisma/prisma.config.ts"
+    "db:validate": "prisma validate --config prisma/prisma.config.ts",
+    "db:seed": "npx tsx seed-items.ts",
+    "postinstall": "pnpm db:seed"
   },
   "dependencies": {
     "@prisma/adapter-mariadb": "^7.8.0",

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import styles from "../game.module.css";
-import { PACKS, UPGRADE_ICONS, type Upgrade } from "../types";
+import { PACKS, UPGRADE_ICONS, type Upgrade, type Pack } from "../types";
 
 // Mapeo de IDs de mejoras a nombres de items en PokeAPI
 const UPGRADE_TO_ITEM_MAP: Record<string, string> = {
@@ -23,6 +23,7 @@ interface Props {
   onTabChange: (tab: "mejoras" | "sobres") => void;
   onBuyUpgrade: (id: string) => void;
   onOpenPack: (id: string) => void;
+  packs?: Pack[];
 }
 
 export default function Shop({
@@ -33,30 +34,39 @@ export default function Shop({
   onTabChange,
   onBuyUpgrade,
   onOpenPack,
+  packs = PACKS,
 }: Props) {
   const [itemImages, setItemImages] = useState<Map<string, string>>(new Map());
 
   useEffect(() => {
     const loadItemImages = async () => {
       const images = new Map<string, string>();
-      for (const upgrade of upgrades) {
+      const upgradesToLoad = upgrades.filter(
+        (u) => UPGRADE_TO_ITEM_MAP[u.id] && !itemImages.has(u.id),
+      );
+
+      // Load all images in parallel instead of sequentially
+      const promises = upgradesToLoad.map(async (upgrade) => {
         const pokeapiItemName = UPGRADE_TO_ITEM_MAP[upgrade.id];
-        if (pokeapiItemName && !itemImages.has(upgrade.id)) {
-          try {
-            const response = await fetch(
-              `/api/pokeapi/item?id=${encodeURIComponent(pokeapiItemName)}`,
-            );
-            if (response.ok) {
-              const item = await response.json();
-              if (item.image) {
-                images.set(upgrade.id, item.image);
-              }
+        if (!pokeapiItemName) return null;
+
+        try {
+          const response = await fetch(
+            `/api/pokeapi/item?id=${encodeURIComponent(pokeapiItemName)}`,
+          );
+          if (response.ok) {
+            const item = await response.json();
+            if (item.image) {
+              images.set(upgrade.id, item.image);
             }
-          } catch (error) {
-            console.error(`Failed to load image for ${upgrade.id}:`, error);
           }
+        } catch (error) {
+          console.error(`Failed to load image for ${upgrade.id}:`, error);
         }
-      }
+      });
+
+      await Promise.all(promises);
+
       if (images.size > 0) {
         setItemImages((prev) => new Map([...prev, ...images]));
       }
@@ -68,30 +78,27 @@ export default function Shop({
   }, [shopTab, upgrades, itemImages]);
   return (
     <>
-      <div className={styles.shopHeader}>
-        <h2 className={styles.shopTitle}>Tienda</h2>
-        <div className={styles.shopTabs} role="tablist">
-          <button
-            className={`${styles.shopTab} ${shopTab === "mejoras" ? styles.shopTabActive : ""}`}
-            onClick={() => onTabChange("mejoras")}
-            role="tab"
-            aria-selected={shopTab === "mejoras"}
-            aria-current={shopTab === "mejoras" ? "page" : undefined}
-            type="button"
-          >
-            Mejoras
-          </button>
-          <button
-            className={`${styles.shopTab} ${shopTab === "sobres" ? styles.shopTabActive : ""}`}
-            onClick={() => onTabChange("sobres")}
-            role="tab"
-            aria-selected={shopTab === "sobres"}
-            aria-current={shopTab === "sobres" ? "page" : undefined}
-            type="button"
-          >
-            Sobres
-          </button>
-        </div>
+      <div className={styles.shopTabs} role="tablist">
+        <button
+          className={`${styles.shopTab} ${shopTab === "mejoras" ? styles.shopTabActive : ""}`}
+          onClick={() => onTabChange("mejoras")}
+          role="tab"
+          aria-selected={shopTab === "mejoras"}
+          aria-current={shopTab === "mejoras" ? "page" : undefined}
+          type="button"
+        >
+          Mejoras
+        </button>
+        <button
+          className={`${styles.shopTab} ${shopTab === "sobres" ? styles.shopTabActive : ""}`}
+          onClick={() => onTabChange("sobres")}
+          role="tab"
+          aria-selected={shopTab === "sobres"}
+          aria-current={shopTab === "sobres" ? "page" : undefined}
+          type="button"
+        >
+          Sobres
+        </button>
       </div>
 
       <div className={styles.shopContent}>
@@ -150,7 +157,7 @@ export default function Shop({
           </div>
         ) : (
           <div className={styles.packsList}>
-            {PACKS.map((pack) => {
+            {packs.map((pack) => {
               const canAfford = money >= pack.cost;
               const opening = isOpening === pack.id;
               return (
@@ -172,13 +179,6 @@ export default function Shop({
                         className={`${styles.rarityPill} ${styles.rarityCommonPill}`}
                       >
                         {pack.probabilities.common}% Común
-                      </span>
-                    )}
-                    {pack.probabilities.rare !== undefined && (
-                      <span
-                        className={`${styles.rarityPill} ${styles.rarityRarePill}`}
-                      >
-                        {pack.probabilities.rare}% Raro
                       </span>
                     )}
                     {pack.probabilities.epic !== undefined && (

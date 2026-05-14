@@ -500,6 +500,7 @@ button:focus-visible {
   max-width: 520px;
   flex-wrap: wrap;
   justify-content: center;
+  align-items: center;
   padding: 0 var(--spacing-sm);
 }
 
@@ -529,20 +530,21 @@ button:focus-visible {
 }
 
 .pokedexBtn {
-  padding: var(--spacing-sm) var(--spacing-md);
+  padding: 12px 28px;
   background-color: var(--color-secondary);
   color: white;
   border: none;
-  border-radius: 8px;
-  font-weight: 600;
+  border-radius: 12px;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  font-size: 0.9rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 0.95rem;
+  box-shadow: 0 4px 16px rgba(42, 117, 187, 0.3);
 }
 
 .pokedexBtn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(42, 117, 187, 0.3);
+  box-shadow: 0 6px 22px rgba(42, 117, 187, 0.42);
 }
 
 /* ====================
@@ -692,6 +694,13 @@ button:focus-visible {
   color: var(--text-muted);
   text-transform: capitalize;
   font-weight: 600;
+}
+
+.pokedexNumber {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-top: 2px;
 }
 
 .pokedexCantidad {
@@ -874,7 +883,6 @@ button:focus-visible {
 
   .openShopMobileBtn {
     min-height: 48px;
-    min-width: 48px;
   }
 }
 
@@ -1004,6 +1012,9 @@ button:focus-visible {
   background: var(--neutral-200);
   border-radius: 10px;
   padding: 3px;
+  margin: var(--spacing-md) var(--spacing-lg) var(--spacing-sm);
+  border-bottom: 1px solid var(--neutral-200);
+  flex-shrink: 0;
 }
 
 .shopTab {
@@ -1345,10 +1356,6 @@ button:focus-visible {
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 16px oklch(52% 0.18 15 / 0.3);
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  margin-top: var(--spacing-sm);
   font-family: var(--font-main);
 }
 

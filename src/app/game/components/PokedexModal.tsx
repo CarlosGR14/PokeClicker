@@ -42,24 +42,27 @@ export default function PokedexModal({ open, pokemon, onClose }: Props) {
         <div className={styles.pokedexModalContent}>
           {pokemon.length > 0 ? (
             <div className={styles.pokedexModalGrid}>
-              {pokemon.map((p) => (
-                <div
-                  key={p.id}
-                  className={`${styles.pokedexCard} ${styles[`rarity_${p.rarity}`]}`}
-                >
-                  <img
-                    src={p.image || undefined}
-                    alt={p.name}
-                    className={styles.pokedexImage}
-                    loading="lazy"
-                  />
-                  <div className={styles.pokedexName}>{p.name}</div>
-                  <div className={styles.pokedexRarity}>{p.rarity}</div>
-                  <div className={styles.pokedexCantidad}>
-                    ×{p.cantidad ?? 1}
+              {pokemon
+                .sort((a, b) => (a.pokeapi_id || 0) - (b.pokeapi_id || 0))
+                .map((p) => (
+                  <div
+                    key={p.id}
+                    className={`${styles.pokedexCard} ${styles[`rarity_${p.rarity}`]}`}
+                  >
+                    <img
+                      src={p.image || undefined}
+                      alt={p.name}
+                      className={styles.pokedexImage}
+                      loading="lazy"
+                    />
+                    <div className={styles.pokedexName}>{p.name}</div>
+                    <div className={styles.pokedexRarity}>{p.rarity}</div>
+                    <div className={styles.pokedexNumber}>#{p.pokeapi_id}</div>
+                    <div className={styles.pokedexCantidad}>
+                      ×{p.cantidad ?? 1}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           ) : (
             <div className={styles.pokedexEmpty}>
