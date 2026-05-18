@@ -24,12 +24,12 @@ export default function Expositor({
   };
 
   return (
-    <div className={styles.expositorSection}>
-      <div className={styles.expositorHeader}>
-        <h3 className={styles.expositorTitle}>✨ Expositor</h3>
+    <section className={styles.expositorSection}>
+      <header className={styles.expositorHeader}>
+        <h2 className={styles.expositorTitle}>✨ Expositor</h2>
         <span className={styles.expositorSubtitle}>Exhibición de Pokémon</span>
-      </div>
-      <div className={styles.expositorFrame}>
+      </header>
+      <article className={styles.expositorFrame}>
         <div className={styles.displaySlots}>
           {displayedPokemon.map((pokemon, index) => (
             <button
@@ -50,9 +50,9 @@ export default function Expositor({
                     className={styles.displaySlotImage}
                   />
                   <div
-                    className={`${styles.rarityBadge} ${rarityColors[pokemon.rarity] || styles.rarityCommon}`}
+                    className={`${styles.rarityBadge} ${rarityColors[pokemon.rarity || "common"] || styles.rarityCommon}`}
                   >
-                    {pokemon.rarity.charAt(0).toUpperCase()}
+                    {(pokemon.rarity || "common").charAt(0).toUpperCase()}
                   </div>
                   {pokemon.cantidad && pokemon.cantidad > 1 && (
                     <div className={styles.displaySlotCantidad}>
@@ -66,15 +66,15 @@ export default function Expositor({
             </button>
           ))}
         </div>
-      </div>
-      <div className={styles.expositorActions}>
+      </article>
+      <nav className={styles.expositorActions}>
         <button className={styles.pokedexBtn} onClick={onPokedexOpen}>
           📖 Pokédex ({collectedCount})
         </button>
         <button className={styles.openShopMobileBtn} onClick={onShopOpen}>
           🛒 Abrir Tienda
         </button>
-      </div>
-    </div>
+      </nav>
+    </section>
   );
 }

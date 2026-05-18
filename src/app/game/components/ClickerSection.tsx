@@ -35,7 +35,7 @@ export default function ClickerSection({
   };
 
   return (
-    <div className={styles.clickerSection}>
+    <section className={styles.clickerSection}>
       <div className={styles.perClickContainer}>
         <span className={styles.perClickLabel}>Por clic:</span>
         <span className={styles.perClickValue}>+{totalClickDamage}</span>
@@ -68,6 +68,6 @@ export default function ClickerSection({
         <span className={styles.multiplierLabel}>Dinero por segundo:</span>
         <span className={styles.multiplierValue}>{(cps ?? 0).toFixed(2)}</span>
       </div>
-    </div>
+    </section>
   );
 }

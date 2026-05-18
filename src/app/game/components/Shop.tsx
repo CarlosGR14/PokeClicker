@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import styles from "../game.module.css";
 import { PACKS, UPGRADE_ICONS, type Upgrade, type Pack } from "../types";
+import { formatMoney } from "@/lib/format";
 
 // Mapeo de IDs de mejoras a nombres de items en PokeAPI
 const UPGRADE_TO_ITEM_MAP: Record<string, string> = {
@@ -101,14 +102,17 @@ export default function Shop({
         </button>
       </div>
 
-      <div className={styles.shopContent}>
+      <section className={styles.shopContent}>
         {shopTab === "mejoras" ? (
-          <div className={styles.upgradesList}>
+          <section
+            className={styles.upgradesList}
+            aria-label="Mejoras disponibles"
+          >
             {upgrades.map((upgrade) => {
               const canAfford = money >= upgrade.cost;
               const itemImage = itemImages.get(upgrade.id);
               return (
-                <div
+                <article
                   key={upgrade.id}
                   className={`${styles.upgradeCard} ${!canAfford ? styles.upgradeCardDisabled : ""}`}
                 >
@@ -148,20 +152,20 @@ export default function Shop({
                       aria-label={`Comprar ${upgrade.name} por ${upgrade.cost} dinero`}
                     >
                       <span className={styles.upgradeBuyIcon}>💰</span>
-                      {upgrade.cost.toLocaleString()}
+                      {formatMoney(upgrade.cost)}
                     </button>
                   </div>
-                </div>
+                </article>
               );
             })}
-          </div>
+          </section>
         ) : (
-          <div className={styles.packsList}>
+          <section className={styles.packsList} aria-label="Sobres disponibles">
             {packs.map((pack) => {
               const canAfford = money >= pack.cost;
               const opening = isOpening === pack.id;
               return (
-                <div
+                <article
                   key={pack.id}
                   className={`${styles.packCard} ${styles[`packCard_${pack.id}`]}`}
                 >
@@ -204,15 +208,15 @@ export default function Shop({
                     {opening ? (
                       <span className={styles.packOpening}>Abriendo…</span>
                     ) : (
-                      <>💰 {pack.cost.toLocaleString()} — Abrir</>
+                      <>💰 {formatMoney(pack.cost)} — Abrir</>
                     )}
                   </button>
-                </div>
+                </article>
               );
             })}
-          </div>
+          </section>
         )}
-      </div>
+      </section>
     </>
   );
 }

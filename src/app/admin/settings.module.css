@@ -1,0 +1,94 @@
+/* Settings Page Styles */
+
+.settingsSection {
+  margin-bottom: 32px;
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  margin-bottom: 16px;
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.gridContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.statusCard {
+  background: oklch(98% 0.005 20);
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid oklch(90% 0.01 20);
+}
+
+.statusLabel {
+  font-size: 0.85rem;
+  color: oklch(50% 0.008 20);
+  font-weight: 600;
+}
+
+.statusValue {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-success);
+  margin-top: 8px;
+}
+
+.systemInfoContainer {
+  background: oklch(98% 0.005 20);
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px solid oklch(90% 0.01 20);
+  margin-top: 32px;
+}
+
+.infoLabel {
+  font-size: 0.85rem;
+  color: oklch(50% 0.008 20);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.infoValue {
+  font-size: 1rem;
+  color: oklch(30% 0.008 20);
+  font-weight: 500;
+}
+
+.dangerZone {
+  background: oklch(95% 0.16 20);
+  padding: 24px;
+  border-radius: 12px;
+  margin-top: 32px;
+  border: 1px solid oklch(85% 0.12 20);
+}
+
+.dangerTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-error);
+  margin-bottom: 16px;
+}
+
+.dangerText {
+  font-size: 0.9rem;
+  color: oklch(30% 0.008 20);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.cpuValue {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: oklch(45% 0.08 250);
+  margin-top: 8px;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}

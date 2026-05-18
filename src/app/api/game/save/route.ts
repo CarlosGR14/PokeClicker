@@ -3,27 +3,11 @@ import { authOptions } from "@/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse, NextRequest } from "next/server";
 import { GameStateSchema } from "@/lib/validations/gameState";
-
-// Simple rate limiting
-const requestStore = new Map<string, { count: number; resetTime: number }>();
-
-function checkRateLimit(key: string): boolean {
-  const now = Date.now();
-  const data = requestStore.get(key);
-
-  if (!data || now > data.resetTime) {
-    requestStore.set(key, { count: 1, resetTime: now + 60000 });
-    return true;
-  }
-
-  if (data.count >= 60) {
-    // 60 requests per minute (1 per second average)
-    return false;
-  }
-
-  data.count++;
-  return true;
-}
+import {
+  rateLimitMiddleware,
+  RATE_LIMIT_CONFIGS,
+  getIdentifier,
+} from "@/lib/middleware/rateLimit";
 
 export async function POST(request: NextRequest) {
   try {
@@ -35,18 +19,39 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
 
-    // Rate limiting
-    const ip =
-      request.headers.get("x-forwarded-for") ||
-      request.headers.get("x-real-ip") ||
-      session.user.email;
+    // Rate limiting - usa identificador por email (más específico que IP)
+    const ip = session.user.email;
+    const identifier = getIdentifier(request);
+    const key = `save:${ip}`;
 
-    if (!checkRateLimit(ip)) {
+    const now = Date.now();
+    const rateLimitData = (global as any).rateLimitStore || {};
+
+    // Usar store global
+    (global as any).rateLimitStore = rateLimitData;
+
+    const { maxRequests: maxSaves, windowMs: savesWindowMs } =
+      RATE_LIMIT_CONFIGS.GAME_SAVE;
+
+    if (!rateLimitData[key] || now > rateLimitData[key].resetTime) {
+      rateLimitData[key] = { count: 0, resetTime: now + savesWindowMs };
+    }
+
+    if (rateLimitData[key].count >= maxSaves) {
+      const retryAfter = Math.ceil((rateLimitData[key].resetTime - now) / 1000);
       return NextResponse.json(
-        { error: "Rate limit exceeded. Max 60 saves per minute." },
-        { status: 429 },
+        {
+          error: "Rate limit exceeded. Max saves per minute reached.",
+          retryAfter,
+        },
+        {
+          status: 429,
+          headers: { "Retry-After": retryAfter.toString() },
+        },
       );
     }
+
+    rateLimitData[key].count++;
 
     // Log para debugging
     console.log(
@@ -57,27 +62,43 @@ export async function POST(request: NextRequest) {
 
     // Obtener cuerpo de la solicitud
     const rawGameState = await request.json();
+    console.log(
+      "Raw game state received:",
+      JSON.stringify(rawGameState, null, 2),
+    );
 
-    // Validar con Zod - Be more permissive for now
-    const gameState = rawGameState; // Skip validation temporarily to debug
-
-    // Basic sanity checks
-    if (
-      typeof gameState.money !== "number" ||
-      typeof gameState.clicks !== "number"
-    ) {
+    // Validar con Zod - Strict validation para security
+    const validationResult = GameStateSchema.safeParse(rawGameState);
+    if (!validationResult.success) {
+      const errors = validationResult.error.flatten();
+      console.error(
+        "Validation failed - Field Errors:",
+        JSON.stringify(errors.fieldErrors, null, 2),
+      );
+      console.error(
+        "Validation failed - General Errors:",
+        JSON.stringify(errors.formErrors, null, 2),
+      );
       return NextResponse.json(
-        { error: "Invalid game state - missing required fields" },
+        {
+          error: "Invalid game state",
+          issues: errors.fieldErrors,
+          formErrors: errors.formErrors,
+        },
         { status: 400 },
       );
     }
 
+    const gameState = validationResult.data;
+
     // Log del contenido recibido
-    console.log("Save request - Money:", gameState.money);
-    console.log("Save request - Clicks:", gameState.clicks);
-    console.log("Save request - Upgrades count:", gameState.upgrades.length);
+    console.log("Save request validated - Money:", gameState.money);
     console.log(
-      "Save request - Pokemon count:",
+      "Save request validated - Upgrades count:",
+      gameState.upgrades.length,
+    );
+    console.log(
+      "Save request validated - Pokemon count:",
       gameState.collectedPokemon.length,
     );
 
@@ -103,12 +124,13 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Actualizar Mejoras (upgrades) - Vincular a PrecioItem
+    // Actualizar Mejoras (upgrades) - Vincular a PrecioItem usando nombre estandarizado desde upgrade.name
     const mejorasExistentes = await prisma.mejora.findMany({
       where: { usuario_id: usuario.id },
       include: { precioItem: true },
     });
 
+    // Mapear por nombre de precioItem para búsqueda rápida
     const mejorasMap = new Map(
       mejorasExistentes.map((m) => [m.precioItem.nombre, m.id]),
     );
@@ -118,10 +140,12 @@ export async function POST(request: NextRequest) {
     const precioItemMap = new Map(precioItems.map((p) => [p.nombre, p]));
 
     // Separar upgrades en updates y creates
+    // IMPORTANTE: Usar upgrade.name como clave (ya fue validado por Zod con IDs válidos)
     const upgradesToUpdate = [];
     const upgradesToCreate = [];
 
     for (const upgrade of gameState.upgrades) {
+      // El nombre ya está validado por Zod schema
       const nombre = upgrade.name;
       const precioItem = precioItemMap.get(nombre);
 
@@ -179,7 +203,58 @@ export async function POST(request: NextRequest) {
         })
         .filter((id: any): id is number => id !== null);
 
-      // Obtener Pokémon existentes del usuario
+      // Obtener TODOS los Pokémon existentes del usuario (puede haber duplicados)
+      const allExistingPokemon = await prisma.pokemon.findMany({
+        where: {
+          usuario_id: usuario.id,
+          pokeapi_id: { in: pokemonIds },
+        },
+      });
+
+      // CONSOLIDATE: Group by pokeapi_id and merge quantities
+      const consolidatedMap = new Map<
+        number,
+        {
+          totalQuantidad: number;
+          records: (typeof allExistingPokemon)[0][];
+        }
+      >();
+
+      for (const pokemon of allExistingPokemon) {
+        const existing = consolidatedMap.get(pokemon.pokeapi_id);
+        if (existing) {
+          existing.totalQuantidad += pokemon.cantidad;
+          existing.records.push(pokemon);
+        } else {
+          consolidatedMap.set(pokemon.pokeapi_id, {
+            totalQuantidad: pokemon.cantidad,
+            records: [pokemon],
+          });
+        }
+      }
+
+      // DELETE duplicates: for each pokeapi_id with multiple records, keep only the first
+      const deleteDuplicatePromises = [];
+      for (const [, { records }] of consolidatedMap.entries()) {
+        if (records.length > 1) {
+          // Delete all except the first one
+          const toDelete = records.slice(1);
+          for (const pokemon of toDelete) {
+            deleteDuplicatePromises.push(
+              prisma.pokemon.delete({ where: { id: pokemon.id } }),
+            );
+          }
+        }
+      }
+
+      if (deleteDuplicatePromises.length > 0) {
+        console.log(
+          `Cleaning up ${deleteDuplicatePromises.length} duplicate Pokemon records...`,
+        );
+        await Promise.all(deleteDuplicatePromises);
+      }
+
+      // Now get the clean single record for each pokeapi_id
       const existingPokemon = await prisma.pokemon.findMany({
         where: {
           usuario_id: usuario.id,
@@ -188,42 +263,41 @@ export async function POST(request: NextRequest) {
       });
 
       const existingMap = new Map(
-        existingPokemon.map((p) => [p.pokeapi_id, p.id]),
+        existingPokemon.map((p) => [p.pokeapi_id, p]),
       );
 
       // Preparar operaciones de upsert
       const upsertPromises = gameState.collectedPokemon
         .map((pokemon: any) => {
-          // Extract pokemonId from format "pokemonId_timestamp" o solo "pokemonId"
+          // Extract pokemonId from format "pokemonId_timestamp" (new capture) or solo "pokemonId" (from DB)
           const match = pokemon.id.match(/^(\d+)(?:_(\d+))?$/);
-          const pokeapiId = match ? parseInt(match[1]) : null;
-          const timestamp = match ? match[2] : null; // Timestamp si existe = es NUEVO
 
-          if (!pokeapiId) {
+          if (!match) {
             console.warn(`Invalid Pokemon ID format: ${pokemon.id}`);
             return null;
           }
 
+          const pokeapiId = parseInt(match[1]);
+          const timestamp = match[2]; // undefined if not present
+          const isNew = !!timestamp; // is new if has timestamp
+
           if (existingMap.has(pokeapiId)) {
-            // Actualizar: solo incrementar si es NUEVO (tiene timestamp)
+            // Update: set exact quantity from client (client has consolidated state)
+            const existingRecord = existingMap.get(pokeapiId)!;
             const data: any = {
               indiceSlot: pokemon.indiceSlot ?? null,
+              cantidad: pokemon.cantidad, // Use exact amount from client
             };
 
-            // Solo incrementar cantidad si tiene timestamp (es un capture nuevo)
-            if (timestamp) {
-              data.cantidad = { increment: 1 };
-            }
-
             return prisma.pokemon.update({
-              where: { id: existingMap.get(pokeapiId)! },
+              where: { id: existingRecord.id },
               data,
             });
           } else {
-            // Crear (solo si tiene timestamp, es un capture nuevo)
-            if (!timestamp) {
+            // Create (only if NEW, is a new capture)
+            if (!isNew) {
               console.warn(
-                `Pokemon ${pokeapiId} no existe y no tiene timestamp, ignorando`,
+                `Pokemon ${pokeapiId} no existe y no es nuevo, ignorando`,
               );
               return null;
             }
@@ -232,7 +306,7 @@ export async function POST(request: NextRequest) {
               data: {
                 usuario_id: usuario.id,
                 pokeapi_id: pokeapiId,
-                cantidad: 1,
+                cantidad: pokemon.cantidad, // Use exact quantity from client
                 indiceSlot: pokemon.indiceSlot ?? null,
               },
             });

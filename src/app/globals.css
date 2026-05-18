@@ -23,6 +23,20 @@
   --neutral-700: oklch(30% 0.008 20);
   --neutral-900: oklch(15% 0.005 20);
 
+  /* Pack Card Colors - Light Mode */
+  --pack-basic-bg: linear-gradient(
+    140deg,
+    oklch(97% 0.018 145) 0%,
+    oklch(95% 0.012 165) 100%
+  );
+  --pack-basic-border: oklch(76% 0.1 145);
+  --pack-epic-bg: linear-gradient(
+    140deg,
+    oklch(97% 0.02 295) 0%,
+    oklch(95% 0.028 305) 100%
+  );
+  --pack-epic-border: oklch(66% 0.16 295);
+
   /* Spacing */
   --spacing-xs: 0.25rem;
   --spacing-sm: 0.5rem;
@@ -62,6 +76,20 @@
     --neutral-300: oklch(60% 0.01 20);
     --neutral-700: oklch(25% 0.008 20);
     --neutral-900: oklch(12% 0.005 20);
+
+    /* Pack Card Colors - Dark Mode */
+    --pack-basic-bg: linear-gradient(
+      140deg,
+      oklch(28% 0.015 145) 0%,
+      oklch(24% 0.012 165) 100%
+    );
+    --pack-basic-border: oklch(42% 0.08 145);
+    --pack-epic-bg: linear-gradient(
+      140deg,
+      oklch(32% 0.018 295) 0%,
+      oklch(26% 0.025 305) 100%
+    );
+    --pack-epic-border: oklch(48% 0.14 295);
   }
 }
 
@@ -100,6 +128,20 @@ html[data-theme="light"] {
   --neutral-300: oklch(82% 0.01 20);
   --neutral-700: oklch(30% 0.008 20);
   --neutral-900: oklch(15% 0.005 20);
+
+  /* Pack Card Colors - Light Mode */
+  --pack-basic-bg: linear-gradient(
+    140deg,
+    oklch(97% 0.018 145) 0%,
+    oklch(95% 0.012 165) 100%
+  );
+  --pack-basic-border: oklch(76% 0.1 145);
+  --pack-epic-bg: linear-gradient(
+    140deg,
+    oklch(97% 0.02 295) 0%,
+    oklch(95% 0.028 305) 100%
+  );
+  --pack-epic-border: oklch(66% 0.16 295);
 }
 
 /* Force dark mode when data-theme="dark" attribute is set */
@@ -128,6 +170,20 @@ html[data-theme="dark"] {
   --neutral-300: oklch(60% 0.01 20);
   --neutral-700: oklch(25% 0.008 20);
   --neutral-900: oklch(12% 0.005 20);
+
+  /* Pack Card Colors - Dark Mode */
+  --pack-basic-bg: linear-gradient(
+    140deg,
+    oklch(28% 0.015 145) 0%,
+    oklch(24% 0.012 165) 100%
+  );
+  --pack-basic-border: oklch(42% 0.08 145);
+  --pack-epic-bg: linear-gradient(
+    140deg,
+    oklch(32% 0.018 295) 0%,
+    oklch(26% 0.025 305) 100%
+  );
+  --pack-epic-border: oklch(48% 0.14 295);
 }
 
 html,
@@ -143,7 +199,7 @@ body {
   flex-direction: column;
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-main);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

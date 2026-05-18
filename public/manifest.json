@@ -1,0 +1,23 @@
+{
+  "name": "Pokéclicker",
+  "short_name": "Pokéclicker",
+  "description": "Catch, collect, and level up Pokémon with idle clicker mechanics",
+  "start_url": "/game",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#ee1515",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "32x32",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

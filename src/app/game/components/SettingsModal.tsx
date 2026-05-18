@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import styles from "../game.module.css";
 
 interface Props {
@@ -15,38 +15,29 @@ export default function SettingsModal({
   onThemeChange,
   onClose,
 }: Props) {
-  useEffect(() => {
-    if (!open) return;
-
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onClose();
-      }
-    };
-
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
-  }, [open, onClose]);
-
   if (!open) return null;
 
+  const handleClose = () => {
+    onClose();
+  };
+
   return (
-    <div className={styles.pokedexBackdrop} onClick={onClose}>
+    <div className={styles.pokedexBackdrop} onClick={handleClose}>
       <div className={styles.pokedexModal} onClick={(e) => e.stopPropagation()}>
-        <div className={styles.pokedexModalHeader}>
+        <header className={styles.pokedexModalHeader}>
           <h2 className={styles.pokedexModalTitle}>Configuración</h2>
           <button
             className={styles.pokedexModalClose}
-            onClick={onClose}
+            onClick={handleClose}
             aria-label="Cerrar configuración"
             type="button"
           >
             ✕
           </button>
-        </div>
+        </header>
 
-        <div className={styles.pokedexModalContent}>
-          <div className={styles.settingsSection}>
+        <section className={styles.pokedexModalContent}>
+          <fieldset className={styles.settingsSection}>
             <h3 className={styles.settingsTitle}>Tema</h3>
             <p className={styles.settingsDescription}>
               Elige cómo deseas ver la interfaz
@@ -89,14 +80,14 @@ export default function SettingsModal({
                 <span className={styles.themeName}>Sistema</span>
               </button>
             </div>
-          </div>
+          </fieldset>
 
-          <div className={styles.settingsSection}>
+          <article className={styles.settingsSection}>
             <h3 className={styles.settingsTitle}>Información</h3>
             <p className={styles.settingsInfo}>Pokéclicker v1.0.0</p>
             <p className={styles.settingsInfo}>© 2026 • Hecho con 💚</p>
-          </div>
-        </div>
+          </article>
+        </section>
       </div>
     </div>
   );

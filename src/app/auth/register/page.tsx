@@ -80,6 +80,7 @@ export default function RegisterPage() {
     }
 
     setIsLoading(true);
+    setErrors({}); // Limpiar errores previos
 
     try {
       // Enviar datos al servidor
@@ -99,8 +100,24 @@ export default function RegisterPage() {
 
       if (!response.ok) {
         console.error("Error en registro:", data);
+
+        // Determinar el tipo de error y mostrar mensaje específico
+        let errorMessage = "Error al registrarse. Intenta de nuevo.";
+
+        if (response.status === 409) {
+          errorMessage =
+            "Este email ya está registrado. Intenta con otro o inicia sesión.";
+        } else if (response.status === 400) {
+          errorMessage = data.error || "Los datos ingresados no son válidos.";
+        } else if (response.status === 500) {
+          errorMessage =
+            "Error interno del servidor. Por favor intenta más tarde.";
+        } else {
+          errorMessage = data.error || errorMessage;
+        }
+
         setErrors({
-          submit: data.error || "Error al registrarse. Intenta de nuevo.",
+          submit: errorMessage,
         });
         setIsLoading(false);
         return;
@@ -123,7 +140,16 @@ export default function RegisterPage() {
       }, 2000);
     } catch (error) {
       console.error("Error en fetch:", error);
-      setErrors({ submit: "Error al conectar con el servidor." });
+
+      // Manejar diferentes tipos de errores de red
+      let errorMessage = "Error al conectar con el servidor.";
+
+      if (error instanceof TypeError && error.message.includes("fetch")) {
+        errorMessage =
+          "No se pudo conectar al servidor. Verifica tu conexión a internet.";
+      }
+
+      setErrors({ submit: errorMessage });
       setIsLoading(false);
     }
   };

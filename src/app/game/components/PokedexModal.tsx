@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import styles from "../game.module.css";
 import type { CollectedPokemon } from "../types";
 
@@ -10,36 +10,27 @@ interface Props {
 }
 
 export default function PokedexModal({ open, pokemon, onClose }: Props) {
-  useEffect(() => {
-    if (!open) return;
-
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onClose();
-      }
-    };
-
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
-  }, [open, onClose]);
-
   if (!open) return null;
 
+  const handleClose = () => {
+    onClose();
+  };
+
   return (
-    <div className={styles.pokedexBackdrop} onClick={onClose}>
+    <div className={styles.pokedexBackdrop} onClick={handleClose}>
       <div className={styles.pokedexModal} onClick={(e) => e.stopPropagation()}>
-        <div className={styles.pokedexModalHeader}>
+        <header className={styles.pokedexModalHeader}>
           <h2 className={styles.pokedexModalTitle}>Pokédex</h2>
           <button
             className={styles.pokedexModalClose}
-            onClick={onClose}
+            onClick={handleClose}
             aria-label="Cerrar Pokédex"
             type="button"
           >
             ✕
           </button>
-        </div>
-        <div className={styles.pokedexModalContent}>
+        </header>
+        <section className={styles.pokedexModalContent}>
           {pokemon.length > 0 ? (
             <div className={styles.pokedexModalGrid}>
               {pokemon
@@ -65,12 +56,12 @@ export default function PokedexModal({ open, pokemon, onClose }: Props) {
                 ))}
             </div>
           ) : (
-            <div className={styles.pokedexEmpty}>
+            <article className={styles.pokedexEmpty}>
               <span className={styles.pokedexEmptyEmoji}>🔍</span>
               <p>No has capturado ningún Pokémon aún</p>
-            </div>
+            </article>
           )}
-        </div>
+        </section>
       </div>
     </div>
   );

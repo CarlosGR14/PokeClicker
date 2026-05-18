@@ -50,13 +50,22 @@ export default function GameHeader({
         >
           ⚙️
         </button>
+        <div
+          aria-live="polite"
+          aria-atomic="true"
+          role="status"
+          style={{ position: "absolute", left: "-9999px" }}
+        >
+          {isSavePending ? "Guardando partida..." : ""}
+        </div>
         <button
           className={styles.headerBtn}
-          aria-label="Guardar juego"
+          aria-label={isSavePending ? "Guardando juego..." : "Guardar juego"}
           onClick={onForceSave}
           type="button"
           title={isSavePending ? "Guardando..." : "Guardar juego ahora"}
           disabled={isSavePending}
+          aria-busy={isSavePending}
         >
           {isSavePending ? "💾..." : "💾"}
         </button>

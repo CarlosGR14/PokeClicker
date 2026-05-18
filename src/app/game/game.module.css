@@ -18,7 +18,7 @@ button:focus-visible {
 
 .pokemonCircle:focus-visible {
   outline: 3px solid var(--color-secondary);
-  outline-offset: 4px;
+  outline-offset: 2px;
 }
 
 .pokedexModalClose:focus-visible,
@@ -116,11 +116,16 @@ button:focus-visible {
   display: flex;
   align-items: center;
   justify-content: center;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .headerBtn:hover {
   background-color: var(--color-primary);
   transform: scale(1.05);
+}
+
+.headerBtn:active {
+  transform: scale(0.95);
 }
 
 /* ====================
@@ -479,7 +484,7 @@ button:focus-visible {
 }
 
 .rarityEpic {
-  background-color: oklch(68% 0.14 50);
+  background-color: oklch(68% 0.14 295);
 }
 
 .rarityLegendary {
@@ -540,11 +545,19 @@ button:focus-visible {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: 0.95rem;
   box-shadow: 0 4px 16px rgba(42, 117, 187, 0.3);
+  -webkit-tap-highlight-color: transparent;
+  min-height: 44px;
+  min-width: 44px;
 }
 
 .pokedexBtn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 22px rgba(42, 117, 187, 0.42);
+}
+
+.pokedexBtn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(42, 117, 187, 0.25);
 }
 
 /* ====================
@@ -722,11 +735,11 @@ button:focus-visible {
    Animation Utility Classes
    ==================== */
 .animateCaptureFlash {
-  animation: captureFlash 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 1;
+  animation: captureFlash 0.6s cubic-bezier(0.4, 0, 0.2, 1) 1;
 }
 
 .animateLevelUp {
-  animation: levelUpGlow 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 1;
+  animation: levelUpGlow 0.8s cubic-bezier(0.4, 0, 0.2, 1) 1;
 }
 
 .animatePokeBallWiggle {
@@ -1201,21 +1214,13 @@ button:focus-visible {
 }
 
 .packCard_basic {
-  background: linear-gradient(
-    140deg,
-    oklch(97% 0.018 145) 0%,
-    oklch(95% 0.012 165) 100%
-  );
-  border-color: oklch(76% 0.1 145);
+  background: var(--pack-basic-bg);
+  border-color: var(--pack-basic-border);
 }
 
 .packCard_epic {
-  background: linear-gradient(
-    140deg,
-    oklch(97% 0.02 295) 0%,
-    oklch(95% 0.028 305) 100%
-  );
-  border-color: oklch(66% 0.16 295);
+  background: var(--pack-epic-bg);
+  border-color: var(--pack-epic-border);
 }
 
 .packIconWrap {
@@ -1452,12 +1457,16 @@ button:focus-visible {
 .captureRevealBackdrop {
   position: fixed;
   inset: 0;
-  background: oklch(0% 0 0 / 0.75);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 400;
   animation: fadeIn 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  background: oklch(0% 0 0 / 0.75);
+}
+
+.captureRevealBackdrop::backdrop {
+  background: oklch(0% 0 0 / 0.75);
 }
 
 .captureRevealCard {
@@ -1470,7 +1479,7 @@ button:focus-visible {
   gap: var(--spacing-md);
   min-width: 260px;
   max-width: 320px;
-  animation: popIn 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: popIn 0.42s cubic-bezier(0.4, 0, 0.2, 1);
   text-align: center;
   will-change: transform, opacity;
 }
@@ -1560,12 +1569,16 @@ button:focus-visible {
 .pokedexBackdrop {
   position: fixed;
   inset: 0;
-  background-color: oklch(0% 0 0 / 0.52);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 200;
   animation: fadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: oklch(0% 0 0 / 0.52);
+}
+
+.pokedexBackdrop::backdrop {
+  background-color: oklch(0% 0 0 / 0.52);
 }
 
 @keyframes fadeIn {

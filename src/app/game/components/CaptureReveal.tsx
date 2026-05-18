@@ -1,5 +1,4 @@
 /* eslint-disable @next/next/no-img-element */
-import { useEffect } from "react";
 import styles from "../game.module.css";
 import { RARITY_LABELS, type CollectedPokemon } from "../types";
 
@@ -9,24 +8,15 @@ interface Props {
 }
 
 export default function CaptureReveal({ pokemon, onClose }: Props) {
-  useEffect(() => {
-    if (!pokemon) return;
-
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onClose();
-      }
-    };
-
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
-  }, [pokemon, onClose]);
-
   if (!pokemon) return null;
 
+  const handleClose = () => {
+    onClose();
+  };
+
   return (
-    <div className={styles.captureRevealBackdrop} onClick={onClose}>
-      <div
+    <div className={styles.captureRevealBackdrop} onClick={handleClose}>
+      <article
         className={`${styles.captureRevealCard} ${styles[`captureReveal_${pokemon.rarity}`]} ${styles.animateCaptureFlash}`}
         onClick={(e) => e.stopPropagation()}
       >
@@ -41,12 +31,12 @@ export default function CaptureReveal({ pokemon, onClose }: Props) {
         <div className={styles.captureRevealName}>{pokemon.name}</div>
         <button
           className={styles.captureRevealClose}
-          onClick={onClose}
+          onClick={handleClose}
           type="button"
         >
           ¡Genial!
         </button>
-      </div>
+      </article>
     </div>
   );
 }

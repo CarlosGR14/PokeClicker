@@ -25,6 +25,12 @@ import DisplaySlotModal from "./components/DisplaySlotModal";
 import CaptureReveal from "./components/CaptureReveal";
 import SettingsModal from "./components/SettingsModal";
 
+// ============ CONSTANTS ============
+const MIN_TIME_BETWEEN_SAVES = 2000; // 2 seconds
+const SAVE_DELAY_NORMAL = 5000; // 5 seconds for normal saves
+const SAVE_DELAY_IMPORTANT = 1000; // 1000ms for important saves (consolidate events)
+const SAVE_DELAY_CRITICAL = 200; // 200ms for critical saves (Pokémon captures, money loss)
+
 function getDefaultGameState(): GameState {
   return {
     money: 0,
@@ -39,7 +45,6 @@ export default function GameClient() {
   // Safe to read localStorage here — SSR is disabled for this component
   const { data: session } = useSession();
   const [gameState, setGameState] = useState<GameState>(getDefaultGameState);
-  const [isLoading, setIsLoading] = useState(true);
   const [isSavePending, setIsSavePending] = useState(false);
   const [pricingConfig, setPricingConfig] = useState<{
     multiplicador_costo: number;
@@ -49,6 +54,7 @@ export default function GameClient() {
   const lastSaveRef = useRef<number>(0);
   const needsSaveRef = useRef<boolean>(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isSavingRef = useRef<boolean>(false); // Previene concurrent saves
 
   const [clickEffect, setClickEffect] = useState<{
     x: number;
@@ -68,6 +74,7 @@ export default function GameClient() {
   const [isOpening, setIsOpening] = useState<string | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark" | "system">(() => {
+    if (typeof window === "undefined") return "system";
     const saved = localStorage.getItem("pokeclicker_theme") as
       | "light"
       | "dark"
@@ -102,8 +109,6 @@ export default function GameClient() {
   useEffect(() => {
     const loadGameFromDB = async () => {
       try {
-        setIsLoading(true);
-
         // Initialize Pokemon pool from PokeAPI (in background) and load game data
         await Promise.all([
           initializePokemonPool(), // Load dynamic Pokemon classifications in parallel
@@ -111,7 +116,11 @@ export default function GameClient() {
           fetch("/api/game/prices", { credentials: "include" }),
         ]).then(async (results) => {
           // Extract responses (skip the pool initialization which is undefined)
-          const [_, gameResponse, pricesResponse] = results as any[];
+          const [, gameResponse, pricesResponse] = results as unknown as [
+            unknown,
+            Response,
+            Response,
+          ];
 
           if (!gameResponse.ok) {
             const errorData = await gameResponse.json().catch(() => ({}));
@@ -131,9 +140,11 @@ export default function GameClient() {
 
           // Almacenar precios base para cálculos posteriores
           const priceMap: Record<string, number> = {};
-          pricesData.prices.forEach((price: any) => {
-            priceMap[price.nombre] = price.precio_base;
-          });
+          pricesData.prices.forEach(
+            (price: { nombre: string; precio_base: number }) => {
+              priceMap[price.nombre] = price.precio_base;
+            },
+          );
           setPriceBaseMap(priceMap);
           setPricingConfig(pricesData.config);
 
@@ -201,8 +212,6 @@ export default function GameClient() {
         console.error("Error loading game state:", error);
         // Fallback to default state
         setGameState(getDefaultGameState());
-      } finally {
-        setIsLoading(false);
       }
     };
 
@@ -226,9 +235,11 @@ export default function GameClient() {
         if (pricesResponse.ok) {
           const pricesData = await pricesResponse.json();
           const newPriceMap: Record<string, number> = {};
-          pricesData.prices.forEach((price: any) => {
-            newPriceMap[price.nombre] = price.precio_base;
-          });
+          pricesData.prices.forEach(
+            (price: { nombre: string; precio_base: number }) => {
+              newPriceMap[price.nombre] = price.precio_base;
+            },
+          );
           setPriceBaseMap(newPriceMap);
           setPricingConfig(pricesData.config);
 
@@ -249,69 +260,87 @@ export default function GameClient() {
   }, []);
 
   // Save game state to BD - with cooldown and importance checking
-  const scheduleGameSave = useCallback(() => {
-    // Clear existing timeout if any
-    if (saveTimeoutRef.current) {
-      clearTimeout(saveTimeoutRef.current);
-    }
-
-    const now = Date.now();
-    const timeSinceLastSave = now - lastSaveRef.current;
-    const minTimeBetweenSaves = 2000; // At least 2 seconds between saves
-
-    // If we don't need to save and haven't waited long enough, skip
-    if (!needsSaveRef.current && timeSinceLastSave < minTimeBetweenSaves) {
-      return;
-    }
-
-    // Calculate delay based on importance
-    const delay = needsSaveRef.current ? 300 : 5000;
-
-    setIsSavePending(true);
-    saveTimeoutRef.current = setTimeout(async () => {
-      try {
-        // Validate data before sending
-        if (gameState.money < 0) {
-          console.warn("Invalid money value detected, rejecting save");
-          return;
-        }
-        if (gameState.clicks < 0) {
-          console.warn("Invalid clicks value detected, rejecting save");
-          return;
-        }
-        if (gameState.cps < 0) {
-          console.warn("Invalid CPS value detected, rejecting save");
-          return;
-        }
-
-        const response = await fetch("/api/game/save", {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(gameState),
-        });
-
-        if (response.status === 401) {
-          // Session expired
-          console.error("Session expired, redirecting to login");
-          window.location.href = "/auth/login";
-          return;
-        }
-
-        if (!response.ok) {
-          throw new Error(`Save failed with status ${response.status}`);
-        }
-
-        lastSaveRef.current = Date.now();
-        needsSaveRef.current = false;
-        setIsSavePending(false);
-        console.log("Game saved successfully");
-      } catch (error) {
-        console.error("Error saving game state:", error);
-        setIsSavePending(false);
+  // FIX: Usa isSavingRef para prevenir concurrent saves (race condition)
+  const scheduleGameSave = useCallback(
+    (urgency: "normal" | "important" | "critical" = "important") => {
+      // Clear existing timeout if any
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
       }
-    }, delay);
-  }, [gameState]);
+
+      // CRITICAL FIX: No guardar si ya hay una guardada
+      if (isSavingRef.current) {
+        return;
+      }
+
+      const now = Date.now();
+      const timeSinceLastSave = now - lastSaveRef.current;
+
+      // If we don't need to save and haven't waited long enough, skip
+      if (urgency === "normal" && timeSinceLastSave < MIN_TIME_BETWEEN_SAVES) {
+        return;
+      }
+
+      // Calculate delay based on urgency level
+      let delay: number;
+      if (urgency === "critical") {
+        delay = SAVE_DELAY_CRITICAL;
+      } else if (urgency === "important") {
+        delay = SAVE_DELAY_IMPORTANT;
+      } else {
+        delay = SAVE_DELAY_NORMAL;
+      }
+
+      setIsSavePending(true);
+      saveTimeoutRef.current = setTimeout(async () => {
+        isSavingRef.current = true;
+        try {
+          // Validate data before sending
+          if (gameState.money < 0) {
+            console.warn("Invalid money value detected, rejecting save");
+            return;
+          }
+          if (gameState.clicks < 0) {
+            console.warn("Invalid clicks value detected, rejecting save");
+            return;
+          }
+          if (gameState.cps < 0) {
+            console.warn("Invalid CPS value detected, rejecting save");
+            return;
+          }
+
+          const response = await fetch("/api/game/save", {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(gameState),
+          });
+
+          if (response.status === 401) {
+            // Session expired
+            console.error("Session expired, redirecting to login");
+            window.location.href = "/auth/login";
+            return;
+          }
+
+          if (!response.ok) {
+            throw new Error(`Save failed with status ${response.status}`);
+          }
+
+          lastSaveRef.current = Date.now();
+          needsSaveRef.current = false;
+          setIsSavePending(false);
+          console.log("Game saved successfully");
+        } catch (error) {
+          console.error("Error saving game state:", error);
+          setIsSavePending(false);
+        } finally {
+          isSavingRef.current = false;
+        }
+      }, delay);
+    },
+    [gameState],
+  );
 
   // Force immediate save (called by manual save button)
   const forceGameSave = useCallback(() => {
@@ -368,18 +397,21 @@ export default function GameClient() {
   useEffect(() => {
     if (gameState.cps === 0) return;
     let lastTime = Date.now();
+    let accumulatedMoney = 0;
     let animationId: number;
 
     const updatePassiveIncome = () => {
       const now = Date.now();
-      const elapsed = now - lastTime;
+      const deltaSeconds = (now - lastTime) / 1000;
+      accumulatedMoney += gameState.cps * deltaSeconds;
 
-      // Only update every ~100ms for consistency
-      if (elapsed >= 100) {
+      if (accumulatedMoney >= 1) {
+        const moneyToAdd = Math.floor(accumulatedMoney);
         setGameState((prev) => ({
           ...prev,
-          money: prev.money + prev.cps / 10,
+          money: prev.money + moneyToAdd,
         }));
+        accumulatedMoney -= moneyToAdd;
         lastTime = now;
       }
 
@@ -409,6 +441,8 @@ export default function GameClient() {
         money: prev.money + totalClickDamage,
         clicks: prev.clicks + totalClickDamage,
       }));
+      // Auto-save después de click (normal - 5s)
+      scheduleGameSave("normal");
     } catch (error) {
       console.error("Click handler error:", error);
     }
@@ -445,9 +479,11 @@ export default function GameClient() {
         if (pricesResponse.ok) {
           const pricesData = await pricesResponse.json();
           const newPriceMap: Record<string, number> = {};
-          pricesData.prices.forEach((price: any) => {
-            newPriceMap[price.nombre] = price.precio_base;
-          });
+          pricesData.prices.forEach(
+            (price: { nombre: string; precio_base: number }) => {
+              newPriceMap[price.nombre] = price.precio_base;
+            },
+          );
           setPriceBaseMap(newPriceMap);
           setPricingConfig(pricesData.config);
 
@@ -462,6 +498,9 @@ export default function GameClient() {
         console.error("Error reloading prices:", error);
       }
     })();
+
+    // Auto-save después de compra (importante - 1s)
+    scheduleGameSave("important");
   };
 
   const openPack = async (packId: string) => {
@@ -513,19 +552,27 @@ export default function GameClient() {
       );
 
       if (existingPokemon) {
-        // Si existe, incrementar cantidad
+        // Si existe, REEMPLAZAR con nueva versión (con timestamp para tracking)
+        // Esto evita duplicados cuando se captura el mismo Pokemon varias veces
+        const newCaptured: CollectedPokemon = {
+          id: makeCaptureId(pokemonId), // Nuevo ID con timestamp
+          name: pokemon.name,
+          image: pokemon.image,
+          rarity,
+          cantidad: (existingPokemon.cantidad ?? 1) + 1, // Incrementa desde el existente
+          indiceSlot: existingPokemon.indiceSlot, // Mantiene slot si está en expositor
+          pokeapi_id: pokemonId,
+        };
+
         setGameState((prev) => ({
           ...prev,
-          collectedPokemon: (prev.collectedPokemon ?? []).map((p) =>
-            p.pokeapi_id === pokemonId
-              ? { ...p, cantidad: (p.cantidad ?? 1) + 1 }
-              : p,
-          ),
+          collectedPokemon: (prev.collectedPokemon ?? [])
+            // Filtrar TODOS los con este pokeapi_id para evitar duplicados
+            .filter((p) => p.pokeapi_id !== pokemonId)
+            // Agregar la nueva versión con timestamp
+            .concat(newCaptured),
         }));
-        setLastCaptured({
-          ...existingPokemon,
-          cantidad: (existingPokemon.cantidad ?? 1) + 1,
-        });
+        setLastCaptured(newCaptured);
       } else {
         // Si no existe, crear uno nuevo
         const captured: CollectedPokemon = {
@@ -542,6 +589,8 @@ export default function GameClient() {
         }));
         setLastCaptured(captured);
       }
+      // Auto-save después de captura (CRÍTICO - 200ms)
+      scheduleGameSave("critical");
     } catch (error) {
       console.error("Error fetching Pokémon:", error);
       setGameState((prev) => ({ ...prev, money: prev.money + pack.cost }));
@@ -571,6 +620,9 @@ export default function GameClient() {
     });
 
     setSelectedDisplaySlot(null);
+
+    // Auto-save después de cambiar slot (importante - 1s)
+    scheduleGameSave("important");
   };
 
   // Derive displayedPokemon from gameState instead of maintaining as state

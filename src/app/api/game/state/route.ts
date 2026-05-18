@@ -100,19 +100,57 @@ export async function GET() {
       clicks: Number(usuario.clicks) || 0,
       cps: calculatedCps,
       upgrades,
-      collectedPokemon: usuario.pokemons.map((pokemon) => ({
-        id: `${pokemon.pokeapi_id}`, // Use pokeapi_id as the unique identifier
-        name: "", // Se llena en frontend con PokeAPI
-        image: "", // Se llena en frontend con PokeAPI
-        rarity: getRarityByPokemonId(pokemon.pokeapi_id),
-        cantidad: pokemon.cantidad,
-        indiceSlot: pokemon.indiceSlot,
-        expuesto:
-          pokemon.indiceSlot !== null &&
-          pokemon.indiceSlot >= 0 &&
-          pokemon.indiceSlot < 4,
-        pokeapi_id: pokemon.pokeapi_id,
-      })),
+      collectedPokemon: (() => {
+        // Consolidate Pokemon by pokeapi_id to prevent duplicates
+        // Group all records with same pokeapi_id and sum their quantities
+        const consolidatedMap = new Map<
+          number,
+          {
+            totalQuantidad: number;
+            indiceSlot: number | null;
+            latestRecord: (typeof usuario.pokemons)[0];
+          }
+        >();
+
+        for (const pokemon of usuario.pokemons) {
+          const existing = consolidatedMap.get(pokemon.pokeapi_id);
+          if (existing) {
+            // Sum quantities from all records with same pokeapi_id
+            existing.totalQuantidad += pokemon.cantidad || 1;
+            // Keep slot from first record that has one (don't overwrite)
+            if (existing.indiceSlot === null && pokemon.indiceSlot !== null) {
+              existing.indiceSlot = pokemon.indiceSlot;
+            }
+            // Keep latest record for metadata
+            if (pokemon.fecha_captura > existing.latestRecord.fecha_captura) {
+              existing.latestRecord = pokemon;
+            }
+          } else {
+            consolidatedMap.set(pokemon.pokeapi_id, {
+              totalQuantidad: pokemon.cantidad || 1,
+              indiceSlot: pokemon.indiceSlot,
+              latestRecord: pokemon,
+            });
+          }
+        }
+
+        // Convert consolidated map to Pokemon array
+        return Array.from(consolidatedMap.entries()).map(
+          ([pokeapi_id, data]) => ({
+            id: `${pokeapi_id}`, // Use pokeapi_id as the unique identifier
+            name: "", // Se llena en frontend con PokeAPI
+            image: "", // Se llena en frontend con PokeAPI
+            rarity: getRarityByPokemonId(pokeapi_id),
+            cantidad: data.totalQuantidad, // Use summed quantity
+            indiceSlot: data.indiceSlot,
+            expuesto:
+              data.indiceSlot !== null &&
+              data.indiceSlot >= 0 &&
+              data.indiceSlot < 4,
+            pokeapi_id,
+          }),
+        );
+      })(),
     };
 
     return NextResponse.json(gameState, { status: 200 });

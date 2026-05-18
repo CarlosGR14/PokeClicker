@@ -1,5 +1,4 @@
 /* eslint-disable @next/next/no-img-element */
-import { useEffect } from "react";
 import styles from "../game.module.css";
 import type { CollectedPokemon } from "../types";
 
@@ -16,57 +15,54 @@ export default function DisplaySlotModal({
   onSelect,
   onClose,
 }: Props) {
-  useEffect(() => {
-    if (slotIndex === null) return;
-
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onClose();
-      }
-    };
-
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
-  }, [slotIndex, onClose]);
-
   if (slotIndex === null) return null;
 
+  const handleClose = () => {
+    onClose();
+  };
+
   return (
-    <div className={styles.pokedexBackdrop} onClick={onClose}>
+    <div className={styles.pokedexBackdrop} onClick={handleClose}>
       <div className={styles.pokedexModal} onClick={(e) => e.stopPropagation()}>
-        <div className={styles.pokedexModalHeader}>
+        <header className={styles.pokedexModalHeader}>
           <h2 className={styles.pokedexModalTitle}>
             Selecciona un Pokémon — Slot {slotIndex + 1}
           </h2>
           <button
             className={styles.pokedexModalClose}
-            onClick={onClose}
+            onClick={handleClose}
             aria-label="Cerrar modal"
             type="button"
           >
             ✕
           </button>
-        </div>
-        <div className={styles.pokedexModalContent}>
+        </header>
+        <section className={styles.pokedexModalContent}>
           {pokemon.length > 0 ? (
             <div className={styles.pokedexModalGrid}>
-              {pokemon.map((p) => (
-                <button
-                  key={p.id}
-                  className={`${styles.pokedexCard} ${styles[`rarity_${p.rarity}`]}`}
-                  onClick={() => onSelect(slotIndex, p)}
-                  type="button"
-                >
-                  <img
-                    src={p.image}
-                    alt={p.name}
-                    className={styles.pokedexImage}
-                    loading="lazy"
-                  />
-                  <div className={styles.pokedexName}>{p.name}</div>
-                  <div className={styles.pokedexRarity}>{p.rarity}</div>
-                </button>
-              ))}
+              {pokemon
+                .sort((a, b) => (a.pokeapi_id || 0) - (b.pokeapi_id || 0))
+                .map((p) => (
+                  <button
+                    key={p.id}
+                    className={`${styles.pokedexCard} ${styles[`rarity_${p.rarity}`]}`}
+                    onClick={() => onSelect(slotIndex, p)}
+                    type="button"
+                  >
+                    <img
+                      src={p.image}
+                      alt={p.name}
+                      className={styles.pokedexImage}
+                      loading="lazy"
+                    />
+                    <div className={styles.pokedexName}>{p.name}</div>
+                    <div className={styles.pokedexRarity}>{p.rarity}</div>
+                    <div className={styles.pokedexNumber}>#{p.pokeapi_id}</div>
+                    <div className={styles.pokedexCantidad}>
+                      ×{p.cantidad ?? 1}
+                    </div>
+                  </button>
+                ))}
             </div>
           ) : (
             <div className={styles.pokedexEmpty}>
@@ -74,7 +70,7 @@ export default function DisplaySlotModal({
               <p>No has capturado ningún Pokémon aún</p>
             </div>
           )}
-        </div>
+        </section>
       </div>
     </div>
   );
