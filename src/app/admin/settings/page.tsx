@@ -81,42 +81,6 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
-
-      {/* Danger Zone */}
-      <div
-        style={{
-          background: "oklch(95% 0.16 20)",
-          padding: "24px",
-          borderRadius: "12px",
-          marginTop: "32px",
-          border: "1px solid oklch(85% 0.16 20)",
-        }}
-      >
-        <h2
-          style={{
-            fontSize: "1.1rem",
-            marginBottom: "16px",
-            color: "oklch(52% 0.18 15)",
-            fontWeight: 700,
-          }}
-        >
-          ⚠️ Zona de Peligro
-        </h2>
-        <p
-          style={{
-            color: "oklch(40% 0.016 20)",
-            marginBottom: "16px",
-            fontSize: "0.95rem",
-          }}
-        >
-          Estas acciones pueden afectar significativamente el sistema. Úsalas
-          con cuidado.
-        </p>
-        <button className={styles.buttonDanger} style={{ marginRight: "12px" }}>
-          🔄 Reiniciar Servidor
-        </button>
-        <button className={styles.buttonDanger}>🗑️ Limpiar Cache</button>
-      </div>
     </>
   );
 }

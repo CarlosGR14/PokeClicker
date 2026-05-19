@@ -31,7 +31,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable}`}>
+    <html lang="es" className={`${inter.variable}`}>
       <body>
         <AuthProvider>{children}</AuthProvider>
       </body>

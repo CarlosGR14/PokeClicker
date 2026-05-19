@@ -118,13 +118,12 @@ export default function AdminPage() {
               📝 Registros Recientes
             </h2>
             <div className={styles.tableContainer}>
-              <table className={styles.table}>
+              <table className={styles.table} style={{ width: "100%" }}>
                 <thead>
                   <tr>
-                    <th>Usuario</th>
-                    <th>Email</th>
-                    <th>Fecha de Registro</th>
-                    <th>Acciones</th>
+                    <th style={{ width: "25%" }}>Usuario</th>
+                    <th style={{ width: "50%" }}>Email</th>
+                    <th style={{ width: "25%" }}>Fecha de Registro</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -143,9 +142,6 @@ export default function AdminPage() {
                             minute: "2-digit",
                           },
                         )}
-                      </td>
-                      <td>
-                        <button className={styles.buttonSecondary}>Ver</button>
                       </td>
                     </tr>
                   ))}

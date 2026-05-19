@@ -838,7 +838,7 @@ button:focus-visible {
   .displaySlot {
     width: 100%;
     aspect-ratio: 1;
-    min-height: 60px;
+    min-height: 80px;
   }
 
   .pokedexModal {
@@ -954,22 +954,22 @@ button:focus-visible {
   .displaySlot {
     width: 100%;
     aspect-ratio: 1;
-    min-height: 50px;
+    min-height: 70px;
   }
 
   .pokedexGrid {
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     gap: var(--spacing-xs);
     max-height: 250px;
   }
 
   .pokedexCard {
-    padding: var(--spacing-xs);
+    padding: var(--spacing-sm);
   }
 
   .pokedexImage {
-    width: 60px;
-    height: 60px;
+    width: 80px;
+    height: 80px;
   }
 
   .pokedexModal {

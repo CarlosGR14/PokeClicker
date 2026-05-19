@@ -114,3 +114,51 @@ export async function PUT(request: NextRequest) {
     );
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    // Verificar que sea admin
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    }
+
+    const admin = await prisma.usuario.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!admin || admin.role !== "admin") {
+      return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+    }
+
+    const { id } = await request.json();
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "ID de usuario requerido" },
+        { status: 400 },
+      );
+    }
+
+    // Prevent deleting yourself
+    if (admin.id === parseInt(id)) {
+      return NextResponse.json(
+        { error: "No puedes eliminar tu propia cuenta" },
+        { status: 400 },
+      );
+    }
+
+    await prisma.usuario.delete({
+      where: { id: parseInt(id) },
+    });
+
+    return NextResponse.json({ success: true, message: "Usuario eliminado" });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    return NextResponse.json(
+      { error: "Error al eliminar usuario" },
+      { status: 500 },
+    );
+  }
+}
