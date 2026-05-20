@@ -18,15 +18,15 @@
 }
 
 .statusCard {
-  background: oklch(98% 0.005 20);
+  background: #fcf7f7;
   padding: 16px;
   border-radius: 8px;
-  border: 1px solid oklch(90% 0.01 20);
+  border: 1px solid #e5dbdb;
 }
 
 .statusLabel {
   font-size: 0.85rem;
-  color: oklch(50% 0.008 20);
+  color: #686161;
   font-weight: 600;
 }
 
@@ -38,32 +38,32 @@
 }
 
 .systemInfoContainer {
-  background: oklch(98% 0.005 20);
+  background: #fcf7f7;
   padding: 24px;
   border-radius: 12px;
-  border: 1px solid oklch(90% 0.01 20);
+  border: 1px solid #e5dbdb;
   margin-top: 32px;
 }
 
 .infoLabel {
   font-size: 0.85rem;
-  color: oklch(50% 0.008 20);
+  color: #686161;
   font-weight: 600;
   margin-bottom: 8px;
 }
 
 .infoValue {
   font-size: 1rem;
-  color: oklch(30% 0.008 20);
+  color: #322c2c;
   font-weight: 500;
 }
 
 .dangerZone {
-  background: oklch(95% 0.16 20);
+  background: #ffc1c2;
   padding: 24px;
   border-radius: 12px;
   margin-top: 32px;
-  border: 1px solid oklch(85% 0.12 20);
+  border: 1px solid #ffadad;
 }
 
 .dangerTitle {
@@ -75,7 +75,7 @@
 
 .dangerText {
   font-size: 0.9rem;
-  color: oklch(30% 0.008 20);
+  color: #322c2c;
   line-height: 1.6;
   margin-bottom: 16px;
 }
@@ -83,7 +83,7 @@
 .cpuValue {
   font-size: 1.25rem;
   font-weight: 700;
-  color: oklch(45% 0.08 250);
+  color: #305880;
   margin-top: 8px;
 }
 

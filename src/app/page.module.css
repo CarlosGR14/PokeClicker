@@ -5,7 +5,7 @@
   --text-primary: var(--text-main);
   --text-secondary: var(--text-muted);
 
-  --button-primary-hover: oklch(48% 0.16 15);
+  --button-primary-hover: #a4273f;
   --button-secondary-hover: var(--neutral-100);
   --button-secondary-border: var(--neutral-200);
 
@@ -135,7 +135,7 @@ a.secondary {
     --text-primary: var(--text-main);
     --text-secondary: var(--text-muted);
 
-    --button-primary-hover: oklch(58% 0.14 15);
+    --button-primary-hover: #be525f;
     --button-secondary-hover: var(--neutral-700);
     --button-secondary-border: var(--neutral-700);
   }

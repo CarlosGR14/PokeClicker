@@ -4,16 +4,16 @@
   min-height: 100vh;
   background: linear-gradient(
     135deg,
-    oklch(98% 0.005 20) 0%,
-    oklch(96% 0.008 20) 100%
+    #fcf7f7 0%,
+    #f7f0ef 100%
   );
 }
 
 .sidebar {
   background: linear-gradient(
     180deg,
-    oklch(52% 0.18 15) 0%,
-    oklch(48% 0.16 15) 100%
+    #b92846 0%,
+    #a4273f 100%
   );
   color: white;
   padding: 32px 24px;
@@ -78,9 +78,9 @@
 
 .navItemActive {
   background-color: rgba(255, 255, 255, 0.2);
-  color: oklch(75% 0.15 85);
+  color: #d9a514;
   font-weight: 600;
-  border-left-color: oklch(75% 0.15 85);
+  border-left-color: #d9a514;
   box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.1);
 }
 
@@ -117,8 +117,8 @@
 .mainContent {
   background: linear-gradient(
     135deg,
-    oklch(98% 0.005 20) 0%,
-    oklch(96% 0.008 20) 100%
+    #fcf7f7 0%,
+    #f7f0ef 100%
   );
   overflow-y: auto;
   margin-left: 280px;
@@ -141,7 +141,7 @@
 .pageTitle {
   font-size: 2.4rem;
   font-weight: 800;
-  color: oklch(52% 0.18 15);
+  color: #b92846;
   margin: 0;
   letter-spacing: -0.8px;
   font-family:
@@ -154,7 +154,7 @@
 
 .pageDescription {
   font-size: 0.95rem;
-  color: oklch(35% 0.008 20);
+  color: #3f3939;
   margin-top: 12px;
   font-weight: 500;
 }
@@ -184,7 +184,7 @@
     left: 0;
     width: 100%;
     height: 4px;
-    background: linear-gradient(90deg, oklch(52% 0.18 15), oklch(60% 0.16 250));
+    background: linear-gradient(90deg, #b92846, #1a83db);
     opacity: 0;
     transition: opacity 250ms ease;
   }
@@ -192,7 +192,7 @@
   &:hover {
     box-shadow: 0 12px 32px rgba(231, 76, 60, 0.12);
     transform: translateY(-6px);
-    border-color: oklch(87% 0.01 20);
+    border-color: #dbd2d1;
 
     &::before {
       opacity: 1;
@@ -202,7 +202,7 @@
 
 .kpiLabel {
   font-size: 0.75rem;
-  color: oklch(35% 0.008 20);
+  color: #3f3939;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -215,7 +215,7 @@
 .kpiValue {
   font-size: 2.8rem;
   font-weight: 800;
-  color: oklch(52% 0.18 15);
+  color: #b92846;
   font-family:
     "Inter",
     -apple-system,
@@ -228,7 +228,7 @@
 
 .kpiSubtext {
   font-size: 0.8rem;
-  color: oklch(40% 0.008 20);
+  color: #4c4646;
   margin-top: 12px;
   font-weight: 500;
 }
@@ -237,7 +237,7 @@
 .tableContainer {
   background: white;
   border-radius: 16px;
-  border: 2px solid oklch(87% 0.01 20);
+  border: 2px solid #dbd2d1;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   margin-top: 32px;
@@ -251,17 +251,17 @@
   th {
     background: linear-gradient(
       90deg,
-      oklch(96% 0.008 20),
-      oklch(94% 0.008 20)
+      #f7f0ef,
+      #f0e9e9
     );
     padding: 18px 20px;
     text-align: left;
     font-weight: 700;
     font-size: 0.8rem;
-    color: oklch(40% 0.008 20);
+    color: #4c4646;
     text-transform: uppercase;
     letter-spacing: 0.6px;
-    border-bottom: 2px solid oklch(87% 0.01 20);
+    border-bottom: 2px solid #dbd2d1;
     font-family:
       "Inter",
       -apple-system,
@@ -272,9 +272,9 @@
 
   td {
     padding: 16px 20px;
-    border-bottom: 1px solid oklch(93% 0.005 20);
+    border-bottom: 1px solid #ebe7e6;
     font-size: 0.95rem;
-    color: oklch(30% 0.008 20);
+    color: #322c2c;
     font-family:
       "Inter",
       -apple-system,
@@ -292,7 +292,7 @@
   }
 
   tbody tr:hover {
-    background-color: oklch(98% 0.008 20);
+    background-color: #fef6f6;
   }
 }
 
@@ -305,7 +305,7 @@
   display: block;
   font-weight: 600;
   font-size: 0.95rem;
-  color: oklch(30% 0.008 20);
+  color: #322c2c;
   margin-bottom: 10px;
   font-family:
     "Inter",
@@ -320,7 +320,7 @@
 .textarea {
   width: 100%;
   padding: 14px 16px;
-  border: 2px solid oklch(82% 0.01 20);
+  border: 2px solid #cac2c1;
   border-radius: 12px;
   font-family:
     "Inter",
@@ -329,25 +329,25 @@
     "Segoe UI",
     sans-serif;
   font-size: 0.95rem;
-  color: oklch(30% 0.008 20);
+  color: #322c2c;
   transition: all 180ms cubic-bezier(0.4, 0, 0.2, 1);
   background-color: white;
 
   &:focus {
     outline: none;
-    border-color: oklch(52% 0.18 15);
+    border-color: #b92846;
     box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
   }
 
   &:disabled {
-    background-color: oklch(96% 0.008 20);
-    color: oklch(50% 0.008 20);
+    background-color: #f7f0ef;
+    color: #686161;
     cursor: not-allowed;
-    border-color: oklch(87% 0.01 20);
+    border-color: #dbd2d1;
   }
 
   &::placeholder {
-    color: oklch(60% 0.008 20);
+    color: #857e7e;
   }
 }
 
@@ -381,8 +381,8 @@
 .buttonPrimary {
   background: linear-gradient(
     135deg,
-    oklch(52% 0.18 15) 0%,
-    oklch(50% 0.16 20) 100%
+    #b92846 0%,
+    #ac2f3b 100%
   );
   color: white;
   box-shadow: 0 4px 12px rgba(231, 76, 60, 0.2);
@@ -399,14 +399,14 @@
 }
 
 .buttonSecondary {
-  background-color: oklch(94% 0.008 20);
-  color: oklch(30% 0.008 20);
-  border: 2px solid oklch(82% 0.01 20);
+  background-color: #f0e9e9;
+  color: #322c2c;
+  border: 2px solid #cac2c1;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 
   &:hover {
-    background-color: oklch(90% 0.008 20);
-    border-color: oklch(70% 0.01 20);
+    background-color: #e3dcdc;
+    border-color: #a59c9c;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   }
@@ -419,8 +419,8 @@
 .buttonDanger {
   background: linear-gradient(
     135deg,
-    oklch(50% 0.16 20) 0%,
-    oklch(48% 0.14 20) 100%
+    #ac2f3b 0%,
+    #9d343b 100%
   );
   color: white;
   box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);

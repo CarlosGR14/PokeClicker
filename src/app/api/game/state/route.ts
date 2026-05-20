@@ -35,12 +35,8 @@ export async function GET() {
       include: { precioItem: true },
     });
 
-    // Obtener configuración global (multiplicador)
-    const config = await prisma.configGlobal.findUnique({
-      where: { id: 1 },
-    });
-
-    const multiplicador = config?.multiplicador_costo || 1.15;
+    // Multiplicador de precios global
+    const multiplicador = 1.15;
 
     // Mapear datos a GameState
     // Asegurar que money, clicks y cps nunca sean undefined

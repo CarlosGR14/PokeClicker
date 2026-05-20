@@ -36,8 +36,8 @@
 .card {
   width: 100%;
   max-width: 480px;
-  background: oklch(98% 0.005 20);
-  border: 1px solid oklch(87% 0.01 20);
+  background: #fcf7f7;
+  border: 1px solid #dbd2d1;
   border-radius: 16px;
   padding: 40px;
   box-shadow:
@@ -49,8 +49,8 @@
 
 @media (prefers-color-scheme: dark) {
   .card {
-    background: oklch(15% 0.005 20);
-    border-color: oklch(30% 0.008 20);
+    background: #0d0a0a;
+    border-color: #322c2c;
     box-shadow:
       0 1px 3px rgba(0, 0, 0, 0.3),
       0 4px 12px rgba(0, 0, 0, 0.4),
@@ -78,13 +78,13 @@
   font-weight: 700;
   line-height: 1.2;
   margin-bottom: 8px;
-  color: oklch(15% 0.005 20);
+  color: #0d0a0a;
   letter-spacing: -0.5px;
 }
 
 @media (prefers-color-scheme: dark) {
   .title {
-    color: oklch(98% 0.005 20);
+    color: #fcf7f7;
   }
 }
 
@@ -98,13 +98,13 @@
   font-size: 14px;
   font-weight: 400;
   line-height: 1.5;
-  color: oklch(50% 0.008 20);
+  color: #686161;
   margin-bottom: 32px;
 }
 
 @media (prefers-color-scheme: dark) {
   .subtitle {
-    color: oklch(70% 0.008 20);
+    color: #a39c9c;
   }
 }
 
@@ -131,12 +131,12 @@
   line-height: 1.4;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: oklch(40% 0.008 20);
+  color: #4c4646;
 }
 
 @media (prefers-color-scheme: dark) {
   .label {
-    color: oklch(75% 0.008 20);
+    color: #b3acac;
   }
 }
 
@@ -149,10 +149,10 @@
   font-size: 16px;
   font-weight: 400;
   line-height: 1.5;
-  border: 2px solid oklch(87% 0.01 20);
+  border: 2px solid #dbd2d1;
   border-radius: 8px;
-  background: oklch(99.5% 0.002 20);
-  color: oklch(15% 0.005 20);
+  background: #fffdfd;
+  color: #0d0a0a;
   transition:
     border-color 150ms cubic-bezier(0.4, 0, 0.2, 1),
     box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1),
@@ -167,36 +167,36 @@
 
 @media (prefers-color-scheme: dark) {
   .input {
-    border-color: oklch(30% 0.008 20);
-    background: oklch(12% 0.004 20);
-    color: oklch(98% 0.005 20);
+    border-color: #322c2c;
+    background: #070505;
+    color: #fcf7f7;
   }
 }
 
 .input::placeholder {
-  color: oklch(70% 0.008 20);
+  color: #a39c9c;
 }
 
 @media (prefers-color-scheme: dark) {
   .input::placeholder {
-    color: oklch(50% 0.008 20);
+    color: #686161;
   }
 }
 
 .input:focus {
   outline: none;
-  border-color: oklch(52% 0.18 15);
-  background-color: oklch(99.8% 0.001 20);
+  border-color: #b92846;
+  background-color: #fffefe;
   box-shadow:
-    0 0 0 3px oklch(52% 0.18 15 / 0.15),
+    0 0 0 3px rgba(185, 40, 70, 0.15),
     inset 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 @media (prefers-color-scheme: dark) {
   .input:focus {
-    background-color: oklch(14% 0.004 20);
+    background-color: #0b0808;
     box-shadow:
-      0 0 0 3px oklch(52% 0.18 15 / 0.25),
+      0 0 0 3px rgba(185, 40, 70, 0.25),
       inset 0 1px 2px rgba(0, 0, 0, 0.3);
   }
 }
@@ -204,37 +204,37 @@
 .input:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  background-color: oklch(95% 0.008 20);
+  background-color: #f4ecec;
 }
 
 @media (prefers-color-scheme: dark) {
   .input:disabled {
-    background-color: oklch(18% 0.006 20);
+    background-color: #141110;
   }
 }
 
 .inputError {
-  border-color: oklch(50% 0.16 20);
-  background-color: oklch(99.8% 0.001 20);
+  border-color: #ac2f3b;
+  background-color: #fffefe;
 }
 
 @media (prefers-color-scheme: dark) {
   .inputError {
-    border-color: oklch(55% 0.16 20);
-    background-color: oklch(14% 0.004 20);
+    border-color: #bd4049;
+    background-color: #0b0808;
   }
 }
 
 .inputError:focus {
   box-shadow:
-    0 0 0 3px oklch(50% 0.16 20 / 0.15),
+    0 0 0 3px rgba(172, 47, 59, 0.15),
     inset 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 @media (prefers-color-scheme: dark) {
   .inputError:focus {
     box-shadow:
-      0 0 0 3px oklch(55% 0.16 20 / 0.25),
+      0 0 0 3px rgba(189, 64, 73, 0.25),
       inset 0 1px 2px rgba(0, 0, 0, 0.3);
   }
 }
@@ -247,7 +247,7 @@
   font-size: 12px;
   font-weight: 500;
   line-height: 1.4;
-  color: oklch(50% 0.16 20);
+  color: #ac2f3b;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -271,7 +271,7 @@
   font-size: 12px;
   font-weight: 500;
   line-height: 1.4;
-  color: oklch(65% 0.12 145);
+  color: #5da260;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -291,13 +291,13 @@
 
 .successMessage {
   padding: 14px 16px;
-  background-color: oklch(85% 0.1 145);
-  border: 1px solid oklch(72% 0.12 145);
+  background-color: #a5e0a5;
+  border: 1px solid #72b875;
   border-radius: 8px;
   margin-bottom: 20px;
   font-size: 14px;
   font-weight: 500;
-  color: oklch(30% 0.1 145);
+  color: #003a05;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -306,9 +306,9 @@
 
 @media (prefers-color-scheme: dark) {
   .successMessage {
-    background-color: oklch(25% 0.08 145);
-    border-color: oklch(45% 0.1 145);
-    color: oklch(75% 0.1 145);
+    background-color: #002b05;
+    border-color: #2c6330;
+    color: #85bf86;
   }
 }
 
@@ -321,8 +321,8 @@
   font-size: 16px;
   font-weight: 600;
   line-height: 1.5;
-  color: oklch(99% 0.001 20);
-  background: oklch(52% 0.18 15);
+  color: #fcfbfb;
+  background: #b92846;
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -346,24 +346,24 @@
 }
 
 .button:hover:not(:disabled) {
-  background-color: oklch(55% 0.18 15);
+  background-color: #c4334f;
   transform: translateY(-2px);
   box-shadow:
     0 4px 12px rgba(0, 0, 0, 0.08),
-    0 12px 24px oklch(52% 0.18 15 / 0.2);
+    0 12px 24px rgba(185, 40, 70, 0.2);
 }
 
 .button:active:not(:disabled) {
   transform: translateY(0);
   box-shadow:
     0 1px 3px rgba(0, 0, 0, 0.05),
-    0 2px 6px oklch(52% 0.18 15 / 0.1);
+    0 2px 6px rgba(185, 40, 70, 0.1);
 }
 
 .button:focus {
   outline: none;
   box-shadow:
-    0 0 0 3px oklch(52% 0.18 15 / 0.2),
+    0 0 0 3px rgba(185, 40, 70, 0.2),
     0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
@@ -382,17 +382,17 @@
   font-size: 14px;
   font-weight: 400;
   line-height: 1.5;
-  color: oklch(50% 0.008 20);
+  color: #686161;
 }
 
 @media (prefers-color-scheme: dark) {
   .loginLink {
-    color: oklch(70% 0.008 20);
+    color: #a39c9c;
   }
 }
 
 .link {
-  color: oklch(52% 0.18 15);
+  color: #b92846;
   font-weight: 600;
   transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1);
   text-decoration: none;
@@ -400,13 +400,13 @@
 }
 
 .link:hover {
-  color: oklch(55% 0.18 15);
-  border-bottom-color: oklch(52% 0.18 15);
+  color: #c4334f;
+  border-bottom-color: #b92846;
 }
 
 .link:focus {
   outline: none;
-  box-shadow: 0 0 0 2px oklch(52% 0.18 15 / 0.2);
+  box-shadow: 0 0 0 2px rgba(185, 40, 70, 0.2);
   border-radius: 2px;
 }
 

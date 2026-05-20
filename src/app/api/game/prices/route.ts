@@ -1,20 +1,17 @@
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 
+const COST_MULTIPLIER = 1.15; // Multiplicador de precios global
+
 export async function GET() {
   try {
-    const [prices, config] = await Promise.all([
-      prisma.precioItem.findMany({
-        orderBy: { tipo: "asc" },
-      }),
-      prisma.configGlobal.findUnique({
-        where: { id: 1 },
-      }),
-    ]);
+    const prices = await prisma.precioItem.findMany({
+      orderBy: { tipo: "asc" },
+    });
 
     return NextResponse.json({
       prices,
-      config: config || { multiplicador_costo: 1.15 },
+      config: { multiplicador_costo: COST_MULTIPLIER },
     });
   } catch (error) {
     console.error("Error fetching prices:", error);

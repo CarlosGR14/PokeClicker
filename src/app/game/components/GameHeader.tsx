@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { signOut } from "next-auth/react";
 import styles from "../game.module.css";
 
@@ -23,6 +24,14 @@ export default function GameHeader({
   return (
     <header className={styles.header}>
       <div className={styles.headerLeft}>
+        <Image
+          src="/logo.png"
+          alt="Pokéclicker"
+          width={2303}
+          height={1256}
+          className={styles.headerLogo}
+          priority
+        />
         <h1 className={styles.playerName}>{userName}</h1>
       </div>
 

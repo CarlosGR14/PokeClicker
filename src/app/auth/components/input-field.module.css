@@ -10,12 +10,12 @@
   line-height: 1.4;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: oklch(40% 0.008 20);
+  color: #4c4646;
 }
 
 @media (prefers-color-scheme: dark) {
   .label {
-    color: oklch(75% 0.008 20);
+    color: #b3acac;
   }
 }
 
@@ -31,7 +31,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: oklch(50% 0.008 20);
+  color: #686161;
   pointer-events: none;
 }
 
@@ -42,10 +42,10 @@
   font-size: 16px;
   font-weight: 400;
   line-height: 1.5;
-  border: 2px solid oklch(87% 0.01 20);
+  border: 2px solid #dbd2d1;
   border-radius: 8px;
-  background: oklch(99.5% 0.002 20);
-  color: oklch(15% 0.005 20);
+  background: #fffdfd;
+  color: #0d0a0a;
   transition:
     border-color 150ms cubic-bezier(0.4, 0, 0.2, 1),
     box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1),
@@ -60,36 +60,36 @@
 
 @media (prefers-color-scheme: dark) {
   .input {
-    border-color: oklch(30% 0.008 20);
-    background: oklch(12% 0.004 20);
-    color: oklch(98% 0.005 20);
+    border-color: #322c2c;
+    background: #070505;
+    color: #fcf7f7;
   }
 }
 
 .input::placeholder {
-  color: oklch(70% 0.008 20);
+  color: #a39c9c;
 }
 
 @media (prefers-color-scheme: dark) {
   .input::placeholder {
-    color: oklch(50% 0.008 20);
+    color: #686161;
   }
 }
 
 .input:focus {
   outline: none;
-  border-color: oklch(52% 0.18 15);
-  background-color: oklch(99.8% 0.001 20);
+  border-color: #b92846;
+  background-color: #fffefe;
   box-shadow:
-    0 0 0 3px oklch(52% 0.18 15 / 0.15),
+    0 0 0 3px rgba(185, 40, 70, 0.15),
     inset 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 @media (prefers-color-scheme: dark) {
   .input:focus {
-    background-color: oklch(14% 0.004 20);
+    background-color: #0b0808;
     box-shadow:
-      0 0 0 3px oklch(52% 0.18 15 / 0.25),
+      0 0 0 3px rgba(185, 40, 70, 0.25),
       inset 0 1px 2px rgba(0, 0, 0, 0.3);
   }
 }
@@ -97,37 +97,37 @@
 .input:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  background-color: oklch(95% 0.008 20);
+  background-color: #f4ecec;
 }
 
 @media (prefers-color-scheme: dark) {
   .input:disabled {
-    background-color: oklch(18% 0.006 20);
+    background-color: #141110;
   }
 }
 
 .inputError {
-  border-color: oklch(50% 0.16 20);
-  background-color: oklch(99.8% 0.001 20);
+  border-color: #ac2f3b;
+  background-color: #fffefe;
 }
 
 @media (prefers-color-scheme: dark) {
   .inputError {
-    border-color: oklch(55% 0.16 20);
-    background-color: oklch(14% 0.004 20);
+    border-color: #bd4049;
+    background-color: #0b0808;
   }
 }
 
 .inputError:focus {
   box-shadow:
-    0 0 0 3px oklch(50% 0.16 20 / 0.15),
+    0 0 0 3px rgba(172, 47, 59, 0.15),
     inset 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 @media (prefers-color-scheme: dark) {
   .inputError:focus {
     box-shadow:
-      0 0 0 3px oklch(55% 0.16 20 / 0.25),
+      0 0 0 3px rgba(189, 64, 73, 0.25),
       inset 0 1px 2px rgba(0, 0, 0, 0.3);
   }
 }
@@ -136,7 +136,7 @@
   font-size: 12px;
   font-weight: 500;
   line-height: 1.4;
-  color: oklch(50% 0.16 20);
+  color: #ac2f3b;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -160,7 +160,7 @@
   font-size: 12px;
   font-weight: 500;
   line-height: 1.4;
-  color: oklch(65% 0.12 145);
+  color: #5da260;
   display: flex;
   align-items: center;
   gap: 6px;

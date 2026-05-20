@@ -100,10 +100,4 @@ model PrecioItem {
   @@map("precio_item")
 }
 
-model ConfigGlobal {
-  id                  Int     @id @default(1)             // Solo una fila
-  multiplicador_costo Float   @default(1.15)              // Multiplicador de precio por compra
-  ultima_actualizacion DateTime @default(now()) @updatedAt
 
-  @@map("config_global")
-}

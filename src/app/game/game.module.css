@@ -34,7 +34,8 @@ button:focus-visible {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--spacing-md) var(--spacing-xl);
+  padding: var(--spacing-md) var(--spacing-xl) var(--spacing-md)
+    var(--spacing-sm);
   background-color: var(--bg-card);
   border-bottom: 2px solid var(--color-primary);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -42,8 +43,13 @@ button:focus-visible {
 
 .headerLeft {
   display: flex;
-  align-items: baseline;
-  gap: var(--spacing-md);
+  align-items: center;
+}
+
+.headerLogo {
+  height: 80px;
+  width: auto;
+  flex-shrink: 0;
 }
 
 .playerName {
@@ -476,23 +482,19 @@ button:focus-visible {
 }
 
 .rarityCommon {
-  background-color: oklch(65% 0.08 145);
+  background-color: #709c71;
 }
 
 .rarityRare {
-  background-color: oklch(60% 0.16 250);
+  background-color: #1a83db;
 }
 
 .rarityEpic {
-  background-color: oklch(68% 0.14 295);
+  background-color: #9f85e5;
 }
 
 .rarityLegendary {
-  background: linear-gradient(
-    135deg,
-    oklch(75% 0.15 85) 0%,
-    oklch(68% 0.14 50) 100%
-  );
+  background: linear-gradient(135deg, #d9a514 0%, #dc7b40 100%);
   box-shadow:
     0 2px 8px rgba(0, 0, 0, 0.2),
     0 0 12px rgba(255, 203, 5, 0.4);
@@ -999,7 +1001,7 @@ button:focus-visible {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 4px 20px oklch(0% 0 0 / 0.06);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
   max-height: calc(100vh - 120px);
 }
 
@@ -1055,7 +1057,7 @@ button:focus-visible {
   background: var(--bg-card);
   color: var(--color-primary);
   font-weight: 700;
-  box-shadow: 0 2px 8px oklch(0% 0 0 / 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .shopContent {
@@ -1089,7 +1091,7 @@ button:focus-visible {
 
 .upgradeCard:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px oklch(0% 0 0 / 0.08);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
   border-color: var(--color-primary);
 }
 
@@ -1149,7 +1151,7 @@ button:focus-visible {
   font-size: 0.65rem;
   font-weight: 800;
   background: var(--color-accent);
-  color: oklch(22% 0.01 20);
+  color: #1f1919;
   padding: 2px 6px;
   border-radius: 10px;
   font-family: var(--font-mono);
@@ -1175,7 +1177,7 @@ button:focus-visible {
 }
 
 .upgradeBuyBtn:hover:not(:disabled) {
-  background: oklch(58% 0.18 15);
+  background: #ce3e57;
   transform: scale(1.04);
 }
 
@@ -1210,7 +1212,7 @@ button:focus-visible {
 
 .packCard:hover {
   transform: translateY(-3px);
-  box-shadow: 0 10px 28px oklch(0% 0 0 / 0.12);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
 }
 
 .packCard_basic {
@@ -1232,7 +1234,7 @@ button:focus-visible {
 .packIcon {
   font-size: 2.8rem;
   display: inline-block;
-  filter: drop-shadow(0 4px 8px oklch(0% 0 0 / 0.15));
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
 }
 
 .packIconShaking {
@@ -1290,23 +1292,23 @@ button:focus-visible {
 }
 
 .rarityCommonPill {
-  background: oklch(93% 0.005 200);
-  color: oklch(38% 0.01 200);
+  background: #e4e9e9;
+  color: #3c4444;
 }
 
 .rarityRarePill {
-  background: oklch(93% 0.04 145);
-  color: oklch(33% 0.1 145);
+  background: #d8efd8;
+  color: #04420f;
 }
 
 .rarityEpicPill {
-  background: oklch(93% 0.04 295);
-  color: oklch(32% 0.12 295);
+  background: #e9e3ff;
+  color: #392068;
 }
 
 .rarityLegendaryPill {
-  background: oklch(95% 0.07 85);
-  color: oklch(33% 0.1 70);
+  background: #ffecb9;
+  color: #542900;
 }
 
 .packBuyBtn {
@@ -1328,15 +1330,15 @@ button:focus-visible {
 }
 
 .packBuyBtn:hover:not(:disabled) {
-  background: oklch(58% 0.18 15);
+  background: #ce3e57;
   transform: scale(1.01);
-  box-shadow: 0 4px 14px oklch(52% 0.18 15 / 0.35);
+  box-shadow: 0 4px 14px rgba(185, 40, 70, 0.35);
 }
 
 .packBuyBtnDisabled {
-  background: oklch(80% 0.01 20) !important;
+  background: #c4bbbb !important;
   cursor: not-allowed;
-  color: oklch(55% 0.01 20);
+  color: #776f6f;
   transform: none !important;
   box-shadow: none !important;
 }
@@ -1360,13 +1362,13 @@ button:focus-visible {
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 16px oklch(52% 0.18 15 / 0.3);
+  box-shadow: 0 4px 16px rgba(185, 40, 70, 0.3);
   font-family: var(--font-main);
 }
 
 .openShopMobileBtn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 22px oklch(52% 0.18 15 / 0.42);
+  box-shadow: 0 6px 22px rgba(185, 40, 70, 0.42);
 }
 
 .openShopMobileBtn:active {
@@ -1379,7 +1381,7 @@ button:focus-visible {
 .drawerBackdrop {
   position: fixed;
   inset: 0;
-  background: oklch(0% 0 0 / 0.52);
+  background: rgba(0, 0, 0, 0.52);
   z-index: 300;
   animation: fadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -1396,7 +1398,7 @@ button:focus-visible {
   display: flex;
   flex-direction: column;
   animation: slideUpDrawer 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 -10px 50px oklch(0% 0 0 / 0.22);
+  box-shadow: 0 -10px 50px rgba(0, 0, 0, 0.22);
   will-change: transform;
 }
 
@@ -1462,11 +1464,11 @@ button:focus-visible {
   justify-content: center;
   z-index: 400;
   animation: fadeIn 0.18s cubic-bezier(0.4, 0, 0.2, 1);
-  background: oklch(0% 0 0 / 0.75);
+  background: rgba(0, 0, 0, 0.75);
 }
 
 .captureRevealBackdrop::backdrop {
-  background: oklch(0% 0 0 / 0.75);
+  background: rgba(0, 0, 0, 0.75);
 }
 
 .captureRevealCard {
@@ -1496,24 +1498,24 @@ button:focus-visible {
 }
 
 .captureReveal_common {
-  border: 3px solid oklch(74% 0.01 200);
-  box-shadow: 0 0 30px oklch(0% 0 0 / 0.14);
+  border: 3px solid #a4adad;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.14);
 }
 
 .captureReveal_rare {
-  border: 3px solid oklch(65% 0.12 145);
-  box-shadow: 0 0 36px oklch(65% 0.12 145 / 0.32);
+  border: 3px solid #5da260;
+  box-shadow: 0 0 36px rgba(93, 162, 96, 0.32);
 }
 
 .captureReveal_epic {
-  border: 3px solid oklch(65% 0.16 295);
-  box-shadow: 0 0 44px oklch(65% 0.16 295 / 0.42);
+  border: 3px solid #9878e5;
+  box-shadow: 0 0 44px rgba(152, 120, 229, 0.42);
 }
 
 .captureReveal_legendary {
-  border: 3px solid oklch(75% 0.15 85);
-  box-shadow: 0 0 60px oklch(75% 0.15 85 / 0.52);
-  background: linear-gradient(140deg, oklch(99% 0.01 85) 0%, white 60%);
+  border: 3px solid #d9a514;
+  box-shadow: 0 0 60px rgba(217, 165, 20, 0.52);
+  background: linear-gradient(140deg, #fffbf4 0%, white 60%);
 }
 
 .captureRevealBadge {
@@ -1559,7 +1561,7 @@ button:focus-visible {
 }
 
 .captureRevealClose:hover {
-  background: oklch(58% 0.18 15);
+  background: #ce3e57;
   transform: scale(1.02);
 }
 
@@ -1574,11 +1576,11 @@ button:focus-visible {
   justify-content: center;
   z-index: 200;
   animation: fadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  background-color: oklch(0% 0 0 / 0.52);
+  background-color: rgba(0, 0, 0, 0.52);
 }
 
 .pokedexBackdrop::backdrop {
-  background-color: oklch(0% 0 0 / 0.52);
+  background-color: rgba(0, 0, 0, 0.52);
 }
 
 @keyframes fadeIn {
@@ -1786,7 +1788,7 @@ button:focus-visible {
 .themeOption:hover {
   border-color: var(--color-primary);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px oklch(0% 0 0 / 0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .themeOptionActive {

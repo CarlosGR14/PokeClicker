@@ -89,16 +89,6 @@
 
 ---
 
-### CONFIG_GLOBAL
-
-**Atributos:**
-
-- `id` (PK) - Siempre = 1 (solo una fila)
-- `multiplicador_costo` - Multiplicador para cálculo de precios
-- `ultima_actualizacion` - Última actualización
-
----
-
 ## Relaciones
 
 ### Relación: CAPTURA
@@ -137,16 +127,6 @@
 
 ---
 
-### Relación: CONFIGURA
-
-- **De:** USUARIO (1)
-- **A:** CONFIG_GLOBAL (1)
-- **Cardinalidad:** 1:1
-- **Tipo:** Conceptual
-- **Descripción:** Configuración global única para todo el sistema
-
----
-
 ## Restricciones de Integridad
 
 ### Restricciones de Clave Primaria
@@ -164,7 +144,7 @@
 - MEJORA (usuario_id, precio_item_id) - máximo una "línea" de compra por item
 - PRECIO_ITEM.nombre (nombres únicos de items)
 
-### Restricciones de Clave Foránea
+### Restricciones
 
 - POKEMON.usuario_id → USUARIO.id (onDelete: Cascade)
 - MEJORA.usuario_id → USUARIO.id (onDelete: Cascade)
@@ -174,12 +154,12 @@
 
 ## Tabla de Cardinalidades
 
-| Relación  | Cardinalidad | Min USUARIO | Max USUARIO | Min Entidad | Max Entidad |
-| --------- | ------------ | ----------- | ----------- | ----------- | ----------- |
-| CAPTURA   | 1:N          | 1           | 1           | 0           | N           |
-| COMPRA    | 1:N          | 1           | 1           | 0           | N           |
-| OPCIONES  | 1:N          | 1           | 1           | 0           | N           |
-| CONFIGURA | 1:1          | 1           | 1           | 1           | 1           |
+| Relación | Cardinalidad | Min USUARIO | Max USUARIO | Min Entidad | Max Entidad |
+| ---------| Cardinalidad | Min USUARIO | Max USUARIO | Min Entidad | Max Entidad |
+| ------- | ------------ | ----------- | ----------- | ----------- | ----------- |
+| CAPTURA | 1:N | 1 | 1 | 0 | N |
+| COMPRA | 1:N | 1 | 1 | 0 | N |
+| OPCIONES| 1:N | 1 | 1 | 0 | N
 
 ---
 
@@ -207,7 +187,12 @@
 - La tabla MEJORA soporta niveles de mejora (`cantidad`)
 - CONFIG_GLOBAL es extensible para nuevos parámetros
 
+### Configuración Global
+
+- El multiplicador de precios (`1.15`) es una constante en código (en `src/app/api/game/*`)
+- No requiere tabla en BD — se mantiene como valor hardcoded para simplificar la arquitectura
+
 ---
 
-**Última actualización:** 18 de Mayo de 2026  
-**Versión:** 2.0 (sin campo rarity en Pokemon)
+**Última actualización:** 20 de Mayo de 2026  
+**Versión:** 2.1 (ConfigGlobal eliminado - multiplicador como constante
