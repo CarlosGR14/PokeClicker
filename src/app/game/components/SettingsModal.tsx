@@ -84,8 +84,7 @@ export default function SettingsModal({
 
           <article className={styles.settingsSection}>
             <h3 className={styles.settingsTitle}>Información</h3>
-            <p className={styles.settingsInfo}>Pokéclicker v1.0.0</p>
-            <p className={styles.settingsInfo}>© 2026 • Hecho con 💚</p>
+            <p className={styles.settingsInfo}>Pokéclicker v1.0.0 © 2026</p>
           </article>
         </section>
       </div>
