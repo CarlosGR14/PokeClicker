@@ -159,7 +159,7 @@ prisma/
 4. **Compra Mejoras**: Usa tus monedas para comprar mejoras (bolas, punches, etc.) que aumentan:
    - **CPS** (monedas por segundo): Gana monedas automáticamente
    - **Click Bonus**: Gana más monedas por cada clic
-5. **Captura Pokémon**: Cada captura se registra en tu Pokédex
+5. **Obten Pokémon**: Cada pokemon sale de un sobre y este se registra en tu Pokédex
 6. **Progresa**: A más mejoras compres, más rápido ganarás monedas. ¡El progreso es infinito!
 
 ## 🔐 Sistema de Autenticación
@@ -268,7 +268,7 @@ Este proyecto está bajo licencia MIT. Ver `LICENSE` para más detalles.
 
 ## 👤 Autor
 
-Proyecto de desarrollo educativo - Pokeclicker 2026
+Proyecto de desarrollo educativo - Carlos Gonzalez Rodriguez - CIFP A Carballeira
 
 ## 🙏 Créditos
 
