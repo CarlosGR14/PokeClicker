@@ -158,45 +158,84 @@ export default function UsersPage() {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            backgroundColor: "rgba(0, 0, 0, 0.6)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             zIndex: 1000,
+            backdropFilter: "blur(2px)",
+            animation: "fadeIn 200ms ease-out",
           }}
           onClick={handleCancelDelete}
         >
           <div
             style={{
-              backgroundColor: "var(--color-background)",
-              border: "1px solid var(--color-border)",
-              borderRadius: "8px",
-              padding: "24px",
-              minWidth: "400px",
-              maxWidth: "500px",
-              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+              backgroundColor: "white",
+              border: "2px solid #dbd2d1",
+              borderRadius: "16px",
+              padding: "32px",
+              minWidth: "420px",
+              maxWidth: "540px",
+              boxShadow:
+                "0 20px 60px rgba(185, 40, 70, 0.12), 0 8px 24px rgba(0, 0, 0, 0.1)",
+              animation: "slideUp 300ms cubic-bezier(0.4, 0, 0.2, 1)",
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h2
-              style={{ marginTop: 0, marginBottom: "16px", color: "#dc2626" }}
+            <div
+              style={{
+                width: "48px",
+                height: "48px",
+                backgroundColor: "#fef2f2",
+                borderRadius: "12px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "24px",
+                marginBottom: "20px",
+              }}
             >
-              ⚠️ Confirmar eliminación
+              ⚠️
+            </div>
+            <h2
+              style={{
+                marginTop: 0,
+                marginBottom: "12px",
+                color: "#b92846",
+                fontSize: "1.5rem",
+                fontWeight: 700,
+                letterSpacing: "-0.3px",
+              }}
+            >
+              Eliminar cuenta
             </h2>
-            <p style={{ marginBottom: "16px", lineHeight: "1.5" }}>
+            <p
+              style={{
+                marginBottom: "16px",
+                lineHeight: "1.6",
+                color: "#322c2c",
+                fontSize: "0.95rem",
+              }}
+            >
               ¿Estás seguro de que deseas{" "}
               <strong>eliminar permanentemente</strong> la cuenta de{" "}
-              <strong>"{userToDelete.nombre}"</strong> ({userToDelete.email})?
+              <strong>"{userToDelete.nombre}"</strong>?
             </p>
             <p
               style={{
-                marginBottom: "24px",
-                color: "#666",
-                fontSize: "0.9rem",
+                marginBottom: "28px",
+                color: "#4c4646",
+                fontSize: "0.85rem",
+                lineHeight: "1.5",
+                backgroundColor: "#fef6f6",
+                padding: "12px 14px",
+                borderRadius: "8px",
+                borderLeft: "3px solid #ac2f3b",
               }}
             >
-              Esta acción no se puede deshacer. Se eliminarán todos los datos
-              del usuario, incluyendo pokémon capturados y mejoras.
+              <strong>Atención:</strong> Esta acción no se puede deshacer. Se
+              eliminarán todos los datos incluyendo pokémon capturados, mejoras
+              y registro de transacciones.
             </p>
             <div
               style={{
@@ -208,22 +247,73 @@ export default function UsersPage() {
               <button
                 className={styles.buttonSecondary}
                 onClick={handleCancelDelete}
-                style={{ padding: "10px 20px" }}
+                style={{
+                  padding: "12px 24px",
+                  fontSize: "0.9rem",
+                  fontWeight: 600,
+                  borderRadius: "10px",
+                  whiteSpace: "nowrap",
+                  transition: "all 180ms cubic-bezier(0.4, 0, 0.2, 1)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#dcd5d4";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "#f0e9e9";
+                  e.currentTarget.style.transform = "translateY(0)";
+                }}
               >
-                ✕ Cancelar
+                Cancelar
               </button>
               <button
                 className={styles.buttonDanger}
                 onClick={handleConfirmDelete}
                 disabled={deleteLoading === userToDelete.id}
-                style={{ padding: "10px 20px" }}
+                style={{
+                  padding: "12px 24px",
+                  fontSize: "0.9rem",
+                  fontWeight: 600,
+                  borderRadius: "10px",
+                  whiteSpace: "nowrap",
+                  transition: "all 180ms cubic-bezier(0.4, 0, 0.2, 1)",
+                  opacity: deleteLoading === userToDelete.id ? 0.7 : 1,
+                }}
+                onMouseEnter={(e) => {
+                  if (deleteLoading !== userToDelete.id) {
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                }}
               >
                 {deleteLoading === userToDelete.id
                   ? "Eliminando..."
-                  : "🗑️ Eliminar cuenta"}
+                  : "🗑️ Eliminar"}
               </button>
             </div>
           </div>
+          <style>{`
+            @keyframes fadeIn {
+              from {
+                opacity: 0;
+              }
+              to {
+                opacity: 1;
+              }
+            }
+            @keyframes slideUp {
+              from {
+                opacity: 0;
+                transform: translateY(12px);
+              }
+              to {
+                opacity: 1;
+                transform: translateY(0);
+              }
+            }
+          `}</style>
         </div>
       )}
 
@@ -301,28 +391,56 @@ export default function UsersPage() {
                 </td>
                 <td>
                   {editingId === user.id ? (
-                    <div style={{ display: "flex", gap: "8px" }}>
+                    <div style={{ display: "flex", gap: "10px" }}>
                       <button
                         className={styles.buttonPrimary}
                         onClick={() => handleSave(user.id)}
-                        style={{ padding: "8px 16px", fontSize: "0.85rem" }}
+                        style={{
+                          padding: "10px 18px",
+                          fontSize: "0.9rem",
+                          fontWeight: 600,
+                          borderRadius: "10px",
+                          whiteSpace: "nowrap",
+                        }}
                       >
                         💾 Guardar
                       </button>
                       <button
                         className={styles.buttonSecondary}
                         onClick={() => setEditingId(null)}
-                        style={{ padding: "8px 16px", fontSize: "0.85rem" }}
+                        style={{
+                          padding: "10px 18px",
+                          fontSize: "0.9rem",
+                          fontWeight: 600,
+                          borderRadius: "10px",
+                          whiteSpace: "nowrap",
+                        }}
                       >
                         ✕ Cancelar
                       </button>
                     </div>
                   ) : (
-                    <div style={{ display: "flex", gap: "8px" }}>
+                    <div style={{ display: "flex", gap: "10px" }}>
                       <button
                         className={styles.buttonSecondary}
                         onClick={() => handleEdit(user)}
-                        style={{ padding: "8px 12px", fontSize: "0.85rem" }}
+                        style={{
+                          padding: "10px 16px",
+                          fontSize: "0.9rem",
+                          fontWeight: 600,
+                          borderRadius: "10px",
+                          whiteSpace: "nowrap",
+                          transition:
+                            "all 180ms cubic-bezier(0.4, 0, 0.2, 1)",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "#dcd5d4";
+                          e.currentTarget.style.transform = "translateY(-2px)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "#f0e9e9";
+                          e.currentTarget.style.transform = "translateY(0)";
+                        }}
                       >
                         ✏️ Editar
                       </button>
@@ -330,7 +448,24 @@ export default function UsersPage() {
                         className={styles.buttonDanger}
                         onClick={() => handleDeleteClick(user)}
                         disabled={deleteLoading === user.id}
-                        style={{ padding: "8px 12px", fontSize: "0.85rem" }}
+                        style={{
+                          padding: "10px 16px",
+                          fontSize: "0.9rem",
+                          fontWeight: 600,
+                          borderRadius: "10px",
+                          whiteSpace: "nowrap",
+                          transition:
+                            "all 180ms cubic-bezier(0.4, 0, 0.2, 1)",
+                          opacity: deleteLoading === user.id ? 0.7 : 1,
+                        }}
+                        onMouseEnter={(e) => {
+                          if (deleteLoading !== user.id) {
+                            e.currentTarget.style.transform = "translateY(-2px)";
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = "translateY(0)";
+                        }}
                       >
                         {deleteLoading === user.id
                           ? "Eliminando..."

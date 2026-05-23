@@ -246,7 +246,7 @@
 .table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
+  table-layout: auto;
 
   th {
     background: linear-gradient(
@@ -379,22 +379,26 @@
 }
 
 .buttonPrimary {
-  background: linear-gradient(
-    135deg,
-    #b92846 0%,
-    #ac2f3b 100%
-  );
+  background: linear-gradient(135deg, #b92846 0%, #ac2f3b 100%);
   color: white;
   box-shadow: 0 4px 12px rgba(231, 76, 60, 0.2);
+  transition: all 180ms cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
     box-shadow: 0 8px 24px rgba(231, 76, 60, 0.3);
     transform: translateY(-2px);
+    background: linear-gradient(135deg, #c43451 0%, #b93546 100%);
   }
 
   &:active {
-    transform: scale(0.98);
+    transform: scale(0.97);
     box-shadow: 0 2px 8px rgba(231, 76, 60, 0.2);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
   }
 }
 
@@ -403,35 +407,48 @@
   color: #322c2c;
   border: 2px solid #cac2c1;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 180ms cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
-    background-color: #e3dcdc;
-    border-color: #a59c9c;
+    background-color: #dcd5d4;
+    border-color: #9d9191;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
   }
 
   &:active {
-    transform: scale(0.98);
+    transform: scale(0.97);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
   }
 }
 
 .buttonDanger {
-  background: linear-gradient(
-    135deg,
-    #ac2f3b 0%,
-    #9d343b 100%
-  );
+  background: linear-gradient(135deg, #ac2f3b 0%, #9d343b 100%);
   color: white;
   box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+  transition: all 180ms cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
     box-shadow: 0 8px 24px rgba(220, 38, 38, 0.3);
     transform: translateY(-2px);
+    background: linear-gradient(135deg, #b63844 0%, #a73d45 100%);
   }
 
   &:active {
-    transform: scale(0.98);
+    transform: scale(0.97);
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
   }
 }
 
