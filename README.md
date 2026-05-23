@@ -32,7 +32,7 @@ Un juego clicker interactivo basado en el universo Pokémon, construido con tecn
 ### Base de Datos
 
 - **Prisma 7** - Migraciones de esquema versionadas
-- **MariaDB** - Base de datos relacional
+- **MySQL** - Base de datos relacional
 - **Modelos**: Usuario, Pokémon, PrecioItem
 
 ### DevOps
@@ -45,7 +45,7 @@ Un juego clicker interactivo basado en el universo Pokémon, construido con tecn
 
 - **Node.js** 18+ o superior
 - **pnpm** 8+ (gestor de paquetes)
-- **MariaDB** - Base de datos requerida
+- **MySQL** - Base de datos requerida
 
 ## 🚀 Instalación y Configuración
 
@@ -248,19 +248,7 @@ pnpm run db:status
 pnpm run db:reset
 ```
 
-## 📚 Documentación Adicional
 
-- [GUIA_DE_ESTILOS.md](./GUIA_DE_ESTILOS.md) - Guía de estilos del proyecto
-- [DATABASE_QUICK_START.md](./DATABASE_QUICK_START.md) - Guía rápida de base de datos
-- [PRISMA_7_SETUP.md](./PRISMA_7_SETUP.md) - Configuración detallada de Prisma 7
-
-## 🤝 Contribuir
-
-1. Fork el repositorio
-2. Crea una rama para tu feature: `git checkout -b feature/AmazingFeature`
-3. Commit tus cambios: `git commit -m 'Add some AmazingFeature'`
-4. Push a la rama: `git push origin feature/AmazingFeature`
-5. Abre un Pull Request
 
 ## 📄 Licencia
 
