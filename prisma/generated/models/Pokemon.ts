@@ -49,6 +49,7 @@ export type PokemonMinAggregateOutputType = {
   cantidad: number | null
   fecha_captura: Date | null
   indiceSlot: number | null
+  rarity: string | null
 }
 
 export type PokemonMaxAggregateOutputType = {
@@ -58,6 +59,7 @@ export type PokemonMaxAggregateOutputType = {
   cantidad: number | null
   fecha_captura: Date | null
   indiceSlot: number | null
+  rarity: string | null
 }
 
 export type PokemonCountAggregateOutputType = {
@@ -67,6 +69,7 @@ export type PokemonCountAggregateOutputType = {
   cantidad: number
   fecha_captura: number
   indiceSlot: number
+  rarity: number
   _all: number
 }
 
@@ -94,6 +97,7 @@ export type PokemonMinAggregateInputType = {
   cantidad?: true
   fecha_captura?: true
   indiceSlot?: true
+  rarity?: true
 }
 
 export type PokemonMaxAggregateInputType = {
@@ -103,6 +107,7 @@ export type PokemonMaxAggregateInputType = {
   cantidad?: true
   fecha_captura?: true
   indiceSlot?: true
+  rarity?: true
 }
 
 export type PokemonCountAggregateInputType = {
@@ -112,6 +117,7 @@ export type PokemonCountAggregateInputType = {
   cantidad?: true
   fecha_captura?: true
   indiceSlot?: true
+  rarity?: true
   _all?: true
 }
 
@@ -208,6 +214,7 @@ export type PokemonGroupByOutputType = {
   cantidad: number
   fecha_captura: Date
   indiceSlot: number | null
+  rarity: string
   _count: PokemonCountAggregateOutputType | null
   _avg: PokemonAvgAggregateOutputType | null
   _sum: PokemonSumAggregateOutputType | null
@@ -240,6 +247,7 @@ export type PokemonWhereInput = {
   cantidad?: Prisma.IntFilter<"Pokemon"> | number
   fecha_captura?: Prisma.DateTimeFilter<"Pokemon"> | Date | string
   indiceSlot?: Prisma.IntNullableFilter<"Pokemon"> | number | null
+  rarity?: Prisma.StringFilter<"Pokemon"> | string
   usuario?: Prisma.XOR<Prisma.UsuarioScalarRelationFilter, Prisma.UsuarioWhereInput>
 }
 
@@ -250,7 +258,9 @@ export type PokemonOrderByWithRelationInput = {
   cantidad?: Prisma.SortOrder
   fecha_captura?: Prisma.SortOrder
   indiceSlot?: Prisma.SortOrderInput | Prisma.SortOrder
+  rarity?: Prisma.SortOrder
   usuario?: Prisma.UsuarioOrderByWithRelationInput
+  _relevance?: Prisma.PokemonOrderByRelevanceInput
 }
 
 export type PokemonWhereUniqueInput = Prisma.AtLeast<{
@@ -264,6 +274,7 @@ export type PokemonWhereUniqueInput = Prisma.AtLeast<{
   cantidad?: Prisma.IntFilter<"Pokemon"> | number
   fecha_captura?: Prisma.DateTimeFilter<"Pokemon"> | Date | string
   indiceSlot?: Prisma.IntNullableFilter<"Pokemon"> | number | null
+  rarity?: Prisma.StringFilter<"Pokemon"> | string
   usuario?: Prisma.XOR<Prisma.UsuarioScalarRelationFilter, Prisma.UsuarioWhereInput>
 }, "id" | "usuario_id_pokeapi_id">
 
@@ -274,6 +285,7 @@ export type PokemonOrderByWithAggregationInput = {
   cantidad?: Prisma.SortOrder
   fecha_captura?: Prisma.SortOrder
   indiceSlot?: Prisma.SortOrderInput | Prisma.SortOrder
+  rarity?: Prisma.SortOrder
   _count?: Prisma.PokemonCountOrderByAggregateInput
   _avg?: Prisma.PokemonAvgOrderByAggregateInput
   _max?: Prisma.PokemonMaxOrderByAggregateInput
@@ -291,6 +303,7 @@ export type PokemonScalarWhereWithAggregatesInput = {
   cantidad?: Prisma.IntWithAggregatesFilter<"Pokemon"> | number
   fecha_captura?: Prisma.DateTimeWithAggregatesFilter<"Pokemon"> | Date | string
   indiceSlot?: Prisma.IntNullableWithAggregatesFilter<"Pokemon"> | number | null
+  rarity?: Prisma.StringWithAggregatesFilter<"Pokemon"> | string
 }
 
 export type PokemonCreateInput = {
@@ -298,6 +311,7 @@ export type PokemonCreateInput = {
   cantidad?: number
   fecha_captura?: Date | string
   indiceSlot?: number | null
+  rarity?: string
   usuario: Prisma.UsuarioCreateNestedOneWithoutPokemonsInput
 }
 
@@ -308,6 +322,7 @@ export type PokemonUncheckedCreateInput = {
   cantidad?: number
   fecha_captura?: Date | string
   indiceSlot?: number | null
+  rarity?: string
 }
 
 export type PokemonUpdateInput = {
@@ -315,6 +330,7 @@ export type PokemonUpdateInput = {
   cantidad?: Prisma.IntFieldUpdateOperationsInput | number
   fecha_captura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   indiceSlot?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  rarity?: Prisma.StringFieldUpdateOperationsInput | string
   usuario?: Prisma.UsuarioUpdateOneRequiredWithoutPokemonsNestedInput
 }
 
@@ -325,6 +341,7 @@ export type PokemonUncheckedUpdateInput = {
   cantidad?: Prisma.IntFieldUpdateOperationsInput | number
   fecha_captura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   indiceSlot?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  rarity?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PokemonCreateManyInput = {
@@ -334,6 +351,7 @@ export type PokemonCreateManyInput = {
   cantidad?: number
   fecha_captura?: Date | string
   indiceSlot?: number | null
+  rarity?: string
 }
 
 export type PokemonUpdateManyMutationInput = {
@@ -341,6 +359,7 @@ export type PokemonUpdateManyMutationInput = {
   cantidad?: Prisma.IntFieldUpdateOperationsInput | number
   fecha_captura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   indiceSlot?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  rarity?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PokemonUncheckedUpdateManyInput = {
@@ -350,6 +369,7 @@ export type PokemonUncheckedUpdateManyInput = {
   cantidad?: Prisma.IntFieldUpdateOperationsInput | number
   fecha_captura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   indiceSlot?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  rarity?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PokemonListRelationFilter = {
@@ -360,6 +380,12 @@ export type PokemonListRelationFilter = {
 
 export type PokemonOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type PokemonOrderByRelevanceInput = {
+  fields: Prisma.PokemonOrderByRelevanceFieldEnum | Prisma.PokemonOrderByRelevanceFieldEnum[]
+  sort: Prisma.SortOrder
+  search: string
 }
 
 export type PokemonUsuario_idPokeapi_idCompoundUniqueInput = {
@@ -374,6 +400,7 @@ export type PokemonCountOrderByAggregateInput = {
   cantidad?: Prisma.SortOrder
   fecha_captura?: Prisma.SortOrder
   indiceSlot?: Prisma.SortOrder
+  rarity?: Prisma.SortOrder
 }
 
 export type PokemonAvgOrderByAggregateInput = {
@@ -391,6 +418,7 @@ export type PokemonMaxOrderByAggregateInput = {
   cantidad?: Prisma.SortOrder
   fecha_captura?: Prisma.SortOrder
   indiceSlot?: Prisma.SortOrder
+  rarity?: Prisma.SortOrder
 }
 
 export type PokemonMinOrderByAggregateInput = {
@@ -400,6 +428,7 @@ export type PokemonMinOrderByAggregateInput = {
   cantidad?: Prisma.SortOrder
   fecha_captura?: Prisma.SortOrder
   indiceSlot?: Prisma.SortOrder
+  rarity?: Prisma.SortOrder
 }
 
 export type PokemonSumOrderByAggregateInput = {
@@ -465,6 +494,7 @@ export type PokemonCreateWithoutUsuarioInput = {
   cantidad?: number
   fecha_captura?: Date | string
   indiceSlot?: number | null
+  rarity?: string
 }
 
 export type PokemonUncheckedCreateWithoutUsuarioInput = {
@@ -473,6 +503,7 @@ export type PokemonUncheckedCreateWithoutUsuarioInput = {
   cantidad?: number
   fecha_captura?: Date | string
   indiceSlot?: number | null
+  rarity?: string
 }
 
 export type PokemonCreateOrConnectWithoutUsuarioInput = {
@@ -511,6 +542,7 @@ export type PokemonScalarWhereInput = {
   cantidad?: Prisma.IntFilter<"Pokemon"> | number
   fecha_captura?: Prisma.DateTimeFilter<"Pokemon"> | Date | string
   indiceSlot?: Prisma.IntNullableFilter<"Pokemon"> | number | null
+  rarity?: Prisma.StringFilter<"Pokemon"> | string
 }
 
 export type PokemonCreateManyUsuarioInput = {
@@ -519,6 +551,7 @@ export type PokemonCreateManyUsuarioInput = {
   cantidad?: number
   fecha_captura?: Date | string
   indiceSlot?: number | null
+  rarity?: string
 }
 
 export type PokemonUpdateWithoutUsuarioInput = {
@@ -526,6 +559,7 @@ export type PokemonUpdateWithoutUsuarioInput = {
   cantidad?: Prisma.IntFieldUpdateOperationsInput | number
   fecha_captura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   indiceSlot?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  rarity?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PokemonUncheckedUpdateWithoutUsuarioInput = {
@@ -534,6 +568,7 @@ export type PokemonUncheckedUpdateWithoutUsuarioInput = {
   cantidad?: Prisma.IntFieldUpdateOperationsInput | number
   fecha_captura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   indiceSlot?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  rarity?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PokemonUncheckedUpdateManyWithoutUsuarioInput = {
@@ -542,6 +577,7 @@ export type PokemonUncheckedUpdateManyWithoutUsuarioInput = {
   cantidad?: Prisma.IntFieldUpdateOperationsInput | number
   fecha_captura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   indiceSlot?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  rarity?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 
@@ -553,6 +589,7 @@ export type PokemonSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   cantidad?: boolean
   fecha_captura?: boolean
   indiceSlot?: boolean
+  rarity?: boolean
   usuario?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["pokemon"]>
 
@@ -565,9 +602,10 @@ export type PokemonSelectScalar = {
   cantidad?: boolean
   fecha_captura?: boolean
   indiceSlot?: boolean
+  rarity?: boolean
 }
 
-export type PokemonOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "usuario_id" | "pokeapi_id" | "cantidad" | "fecha_captura" | "indiceSlot", ExtArgs["result"]["pokemon"]>
+export type PokemonOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "usuario_id" | "pokeapi_id" | "cantidad" | "fecha_captura" | "indiceSlot" | "rarity", ExtArgs["result"]["pokemon"]>
 export type PokemonInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   usuario?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
 }
@@ -584,6 +622,7 @@ export type $PokemonPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     cantidad: number
     fecha_captura: Date
     indiceSlot: number | null
+    rarity: string
   }, ExtArgs["result"]["pokemon"]>
   composites: {}
 }
@@ -960,6 +999,7 @@ export interface PokemonFieldRefs {
   readonly cantidad: Prisma.FieldRef<"Pokemon", 'Int'>
   readonly fecha_captura: Prisma.FieldRef<"Pokemon", 'DateTime'>
   readonly indiceSlot: Prisma.FieldRef<"Pokemon", 'Int'>
+  readonly rarity: Prisma.FieldRef<"Pokemon", 'String'>
 }
     
 

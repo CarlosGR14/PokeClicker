@@ -387,8 +387,7 @@ export const ModelName = {
   Usuario: 'Usuario',
   Pokemon: 'Pokemon',
   Mejora: 'Mejora',
-  PrecioItem: 'PrecioItem',
-  ConfigGlobal: 'ConfigGlobal'
+  PrecioItem: 'PrecioItem'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -404,7 +403,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "usuario" | "pokemon" | "mejora" | "precioItem" | "configGlobal"
+    modelProps: "usuario" | "pokemon" | "mejora" | "precioItem"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -672,72 +671,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    ConfigGlobal: {
-      payload: Prisma.$ConfigGlobalPayload<ExtArgs>
-      fields: Prisma.ConfigGlobalFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.ConfigGlobalFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConfigGlobalPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.ConfigGlobalFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConfigGlobalPayload>
-        }
-        findFirst: {
-          args: Prisma.ConfigGlobalFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConfigGlobalPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.ConfigGlobalFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConfigGlobalPayload>
-        }
-        findMany: {
-          args: Prisma.ConfigGlobalFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConfigGlobalPayload>[]
-        }
-        create: {
-          args: Prisma.ConfigGlobalCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConfigGlobalPayload>
-        }
-        createMany: {
-          args: Prisma.ConfigGlobalCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        delete: {
-          args: Prisma.ConfigGlobalDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConfigGlobalPayload>
-        }
-        update: {
-          args: Prisma.ConfigGlobalUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConfigGlobalPayload>
-        }
-        deleteMany: {
-          args: Prisma.ConfigGlobalDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.ConfigGlobalUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        upsert: {
-          args: Prisma.ConfigGlobalUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConfigGlobalPayload>
-        }
-        aggregate: {
-          args: Prisma.ConfigGlobalAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateConfigGlobal>
-        }
-        groupBy: {
-          args: Prisma.ConfigGlobalGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.ConfigGlobalGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.ConfigGlobalCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.ConfigGlobalCountAggregateOutputType> | number
-        }
-      }
-    }
   }
 } & {
   other: {
@@ -799,7 +732,8 @@ export const PokemonScalarFieldEnum = {
   pokeapi_id: 'pokeapi_id',
   cantidad: 'cantidad',
   fecha_captura: 'fecha_captura',
-  indiceSlot: 'indiceSlot'
+  indiceSlot: 'indiceSlot',
+  rarity: 'rarity'
 } as const
 
 export type PokemonScalarFieldEnum = (typeof PokemonScalarFieldEnum)[keyof typeof PokemonScalarFieldEnum]
@@ -831,15 +765,6 @@ export const PrecioItemScalarFieldEnum = {
 export type PrecioItemScalarFieldEnum = (typeof PrecioItemScalarFieldEnum)[keyof typeof PrecioItemScalarFieldEnum]
 
 
-export const ConfigGlobalScalarFieldEnum = {
-  id: 'id',
-  multiplicador_costo: 'multiplicador_costo',
-  ultima_actualizacion: 'ultima_actualizacion'
-} as const
-
-export type ConfigGlobalScalarFieldEnum = (typeof ConfigGlobalScalarFieldEnum)[keyof typeof ConfigGlobalScalarFieldEnum]
-
-
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -863,6 +788,13 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const PokemonOrderByRelevanceFieldEnum = {
+  rarity: 'rarity'
+} as const
+
+export type PokemonOrderByRelevanceFieldEnum = (typeof PokemonOrderByRelevanceFieldEnum)[keyof typeof PokemonOrderByRelevanceFieldEnum]
 
 
 export const PrecioItemOrderByRelevanceFieldEnum = {
@@ -1054,7 +986,6 @@ export type GlobalOmitConfig = {
   pokemon?: Prisma.PokemonOmit
   mejora?: Prisma.MejoraOmit
   precioItem?: Prisma.PrecioItemOmit
-  configGlobal?: Prisma.ConfigGlobalOmit
 }
 
 /* Types for Logging */

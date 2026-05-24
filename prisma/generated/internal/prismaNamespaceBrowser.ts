@@ -54,8 +54,7 @@ export const ModelName = {
   Usuario: 'Usuario',
   Pokemon: 'Pokemon',
   Mejora: 'Mejora',
-  PrecioItem: 'PrecioItem',
-  ConfigGlobal: 'ConfigGlobal'
+  PrecioItem: 'PrecioItem'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -96,7 +95,8 @@ export const PokemonScalarFieldEnum = {
   pokeapi_id: 'pokeapi_id',
   cantidad: 'cantidad',
   fecha_captura: 'fecha_captura',
-  indiceSlot: 'indiceSlot'
+  indiceSlot: 'indiceSlot',
+  rarity: 'rarity'
 } as const
 
 export type PokemonScalarFieldEnum = (typeof PokemonScalarFieldEnum)[keyof typeof PokemonScalarFieldEnum]
@@ -128,15 +128,6 @@ export const PrecioItemScalarFieldEnum = {
 export type PrecioItemScalarFieldEnum = (typeof PrecioItemScalarFieldEnum)[keyof typeof PrecioItemScalarFieldEnum]
 
 
-export const ConfigGlobalScalarFieldEnum = {
-  id: 'id',
-  multiplicador_costo: 'multiplicador_costo',
-  ultima_actualizacion: 'ultima_actualizacion'
-} as const
-
-export type ConfigGlobalScalarFieldEnum = (typeof ConfigGlobalScalarFieldEnum)[keyof typeof ConfigGlobalScalarFieldEnum]
-
-
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -160,6 +151,13 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const PokemonOrderByRelevanceFieldEnum = {
+  rarity: 'rarity'
+} as const
+
+export type PokemonOrderByRelevanceFieldEnum = (typeof PokemonOrderByRelevanceFieldEnum)[keyof typeof PokemonOrderByRelevanceFieldEnum]
 
 
 export const PrecioItemOrderByRelevanceFieldEnum = {

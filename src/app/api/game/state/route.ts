@@ -136,7 +136,9 @@ export async function GET() {
             id: `${pokeapi_id}`, // Use pokeapi_id as the unique identifier
             name: "", // Se llena en frontend con PokeAPI
             image: "", // Se llena en frontend con PokeAPI
-            rarity: getRarityByPokemonId(pokeapi_id),
+            rarity:
+              (data.latestRecord.rarity as "common" | "epic" | "legendary") ||
+              "common",
             cantidad: data.totalQuantidad, // Use summed quantity
             indiceSlot: data.indiceSlot,
             expuesto:

@@ -1,4 +1,50 @@
 import { prisma } from "./src/lib/db";
+import bcrypt from "bcrypt";
+
+async function seedAdmin() {
+  try {
+    console.log("👨‍💼 Creando usuario admin...\n");
+
+    const adminEmail = "admin@pokeclicker.com";
+    const adminPassword = "Admin123!";
+    const saltRounds = 10;
+
+    // Verificar si el admin ya existe
+    const existingAdmin = await prisma.usuario.findUnique({
+      where: { email: adminEmail },
+    });
+
+    if (existingAdmin) {
+      console.log(`⏭️  Usuario admin ya existe: ${adminEmail}`);
+      return;
+    }
+
+    // Hashear contraseña
+    const hashedPassword = await bcrypt.hash(adminPassword, saltRounds);
+
+    // Crear usuario admin
+    const admin = await prisma.usuario.create({
+      data: {
+        email: adminEmail,
+        nombre: "Administrador",
+        password: hashedPassword,
+        role: "admin",
+        monedas: 1000000, // Darle monedas iniciales
+        clicks: 0,
+        tema: "system",
+      },
+    });
+
+    console.log(`✅ Usuario admin creado exitosamente`);
+    console.log(`📧 Email: ${adminEmail}`);
+    console.log(`🔑 Contraseña: ${adminPassword}`);
+    console.log(
+      `⚠️  Por seguridad, cambia esta contraseña en el primer login\n`,
+    );
+  } catch (error) {
+    console.error("❌ Error creando admin:", error);
+  }
+}
 
 async function seedPrecioItems() {
   try {
@@ -102,9 +148,24 @@ async function seedPrecioItems() {
     console.log("\n✨ PrecioItems insertados correctamente");
   } catch (error) {
     console.error("❌ Error:", error);
+  }
+}
+
+async function main() {
+  try {
+    console.log("🌱 Iniciando seeding de base de datos...\n");
+    console.log("═".repeat(50));
+    await seedAdmin();
+    console.log("═".repeat(50));
+    await seedPrecioItems();
+    console.log("═".repeat(50));
+    console.log("\n✨ Seeding completado exitosamente\n");
+  } catch (error) {
+    console.error("❌ Error durante seeding:", error);
+    process.exit(1);
   } finally {
     await prisma.$disconnect();
   }
 }
 
-seedPrecioItems();
+main();

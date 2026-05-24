@@ -287,6 +287,7 @@ export async function POST(request: NextRequest) {
             const data: any = {
               indiceSlot: pokemon.indiceSlot ?? null,
               cantidad: pokemon.cantidad, // Use exact amount from client
+              rarity: pokemon.rarity ?? "common", // Save rarity to DB
             };
 
             return prisma.pokemon.update({
@@ -308,6 +309,7 @@ export async function POST(request: NextRequest) {
                 pokeapi_id: pokeapiId,
                 cantidad: pokemon.cantidad, // Use exact quantity from client
                 indiceSlot: pokemon.indiceSlot ?? null,
+                rarity: pokemon.rarity ?? "common", // Save rarity when creating
               },
             });
           }

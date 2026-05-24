@@ -60,6 +60,7 @@ model Pokemon {
   cantidad        Int       @default(1)           @db.UnsignedSmallInt
   fecha_captura   DateTime  @default(now())
   indiceSlot      Int?                            @db.UnsignedTinyInt // 0-3 si está en expositor, null si no
+  rarity          String    @default("common")   @db.Char(20)  // common, epic, legendary
 
   @@unique([usuario_id, pokeapi_id])
   @@index([usuario_id])

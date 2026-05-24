@@ -61,8 +61,3 @@ export type Mejora = Prisma.MejoraModel
  * 
  */
 export type PrecioItem = Prisma.PrecioItemModel
-/**
- * Model ConfigGlobal
- * 
- */
-export type ConfigGlobal = Prisma.ConfigGlobalModel
