@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { ZodError } from "zod";
 import styles from "./login.module.css";
 import { loginSchema, type LoginFormData } from "@/lib/validations/auth";

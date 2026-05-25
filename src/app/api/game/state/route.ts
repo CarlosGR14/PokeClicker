@@ -2,7 +2,6 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
-import { getRarityByPokemonId } from "@/app/game/types";
 
 export async function GET() {
   try {
