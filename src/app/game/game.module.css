@@ -495,7 +495,7 @@ button:focus-visible {
 }
 
 .rarityLegendary {
-  background: linear-gradient(135deg, #d9a514 0%, #dc7b40 100%);
+  background: linear-gradient(135deg, #b98c11 0%, #dc7b40 100%);
   box-shadow:
     0 2px 8px rgba(0, 0, 0, 0.2),
     0 0 12px rgba(255, 203, 5, 0.4);
@@ -547,7 +547,7 @@ button:focus-visible {
 
 .pokedexBtn {
   padding: 12px 28px;
-  background-color: var(--secondary-accessible);
+  background-color: #3778ab;
   color: white;
   border: none;
   border-radius: 12px;
@@ -1190,7 +1190,7 @@ button:focus-visible {
   align-items: center;
   gap: 3px;
   padding: 5px 10px;
-  background: var(--color-primary);
+  background: #7a3d49;
   color: white;
   border: none;
   border-radius: 8px;
@@ -1543,7 +1543,7 @@ button:focus-visible {
 }
 
 .captureReveal_legendary {
-  border: 3px solid #d9a514;
+  border: 3px solid #b98c11;
   box-shadow: 0 0 60px rgba(217, 165, 20, 0.52);
   background: linear-gradient(140deg, #fffbf4 0%, white 60%);
 }

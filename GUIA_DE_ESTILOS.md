@@ -10,7 +10,7 @@
 | ------------------- | --------- | ------------------------------------------------------------------------ |
 | `--color-primary`   | `#b92846` | Borde del header, botones de compra, foco, sidebar admin, nombre jugador |
 | `--color-secondary` | `#1a83db` | Valor multiplicador, acentos secundarios                                 |
-| `--color-accent`    | `#d9a514` | Dinero, valores por clic, badge de nivel, nav activo                     |
+| `--color-accent`    | `#b98c11` | Dinero, valores por clic, badge de nivel, nav activo                     |
 
 ---
 
@@ -40,25 +40,25 @@
 
 **Modo Claro:**
 
-| Token CSS                    | Valor     | Uso                                            |
-| ---------------------------- | --------- | ---------------------------------------------- |
-| `--accent-accessible`        | `#af8510` | Valores por clic, acentos (contraste mejorado) |
-| `--secondary-accessible`     | `#1675c5` | Botones secundarios (contraste mejorado)       |
-| `--link-accessible`          | `#ea3256` | Enlaces en formularios                         |
-| `--money-decimal-accessible` | `#ae9244` | Decimales de dinero                            |
-| `--text-disabled`            | `#737272` | Texto deshabilitado/upgrades bloqueados        |
-| `--text-inactive`            | `#5f5a5a` | Tabs inactivos                                 |
+| Token CSS                    | Valor     | Uso                                          |
+| ---------------------------- | --------- | -------------------------------------------- |
+| `--accent-accessible`        | `#b98c11` | Valores por clic, acentos (3:1 sobre blanco) |
+| `--secondary-accessible`     | `#1675c5` | Botones secundarios (contraste mejorado)     |
+| `--link-accessible`          | `#ea3256` | Enlaces en formularios                       |
+| `--money-decimal-accessible` | `#a28c59` | Decimales de dinero (3:1 sobre blanco)       |
+| `--text-disabled`            | `#757373` | Texto deshabilitado (4.5:1 sobre blanco)     |
+| `--text-inactive`            | `#5e5a5a` | Tabs inactivos (4.5:1 sobre #dbd2d1)         |
 
 **Modo Oscuro:**
 
-| Token CSS                    | Valor     | Uso                               |
-| ---------------------------- | --------- | --------------------------------- |
-| `--accent-accessible`        | `#c9a559` | Valores por clic (modo oscuro)    |
-| `--secondary-accessible`     | `#4a9ee1` | Botones secundarios (modo oscuro) |
-| `--link-accessible`          | `#f55a75` | Enlaces (modo oscuro)             |
-| `--money-decimal-accessible` | `#d4b875` | Decimales de dinero (modo oscuro) |
-| `--text-disabled`            | `#8a8888` | Texto deshabilitado (modo oscuro) |
-| `--text-inactive`            | `#9a9595` | Tabs inactivos (modo oscuro)      |
+| Token CSS                    | Valor     | Uso                                           |
+| ---------------------------- | --------- | --------------------------------------------- |
+| `--accent-accessible`        | `#ab8c4b` | Valores por clic (3:1 sobre fondo claro)      |
+| `--secondary-accessible`     | `#3778ab` | Botones secundarios (4.5:1 con texto blanco)  |
+| `--link-accessible`          | `#f55a75` | Enlaces (modo oscuro)                         |
+| `--money-decimal-accessible` | `#a28c59` | Decimales de dinero (consistencia light mode) |
+| `--text-disabled`            | `#757373` | Texto deshabilitado (4.5:1 sobre blanco)      |
+| `--text-inactive`            | `#5e5a5a` | Tabs inactivos (4.5:1)                        |
 
 **📋 Notas sobre accesibilidad:**
 
@@ -99,7 +99,7 @@ El código usa tokens `--neutral-*` en formato hex. Solo existen los niveles uti
 | ---------- | ------------------------- | ------------------------------------------- |
 | Común      | Verde suave               | `#709c71`                                   |
 | Épico      | Púrpura                   | `#9f85e5`                                   |
-| Legendario | Gradiente dorado con glow | `linear-gradient(135deg, #d9a514, #dc7b40)` |
+| Legendario | Gradiente dorado con glow | `linear-gradient(135deg, #b98c11, #dc7b40)` |
 
 #### Tarjetas del Pokédex
 

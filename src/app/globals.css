@@ -2,7 +2,7 @@
   /* Primary Colors */
   --color-primary: #b92846; /* Pokémon Red */
   --color-secondary: #1a83db; /* Electric Blue */
-  --color-accent: #d9a514; /* Pokémon Yellow */
+  --color-accent: #b98c11; /* Pokémon Yellow */
 
   /* Interface Colors - Light Mode */
   --bg-app: #fcf7f7;
@@ -16,12 +16,12 @@
   --color-error: #b32228; /* Red */
 
   /* Accessibility Colors - WCAG AA Compliant */
-  --accent-accessible: #af8510; /* Muted yellow for contrast */
+  --accent-accessible: #b98c11; /* Muted yellow for contrast (3:1 on white) */
   --secondary-accessible: #1675c5; /* Darker blue for contrast */
   --link-accessible: #ea3256; /* Brighter red for link contrast */
-  --money-decimal-accessible: #ae9244; /* Muted gold */
-  --text-disabled: #737272; /* Disabled text contrast */
-  --text-inactive: #5f5a5a; /* Inactive tab text */
+  --money-decimal-accessible: #a28c59; /* Muted gold (3:1 on white) */
+  --text-disabled: #757373; /* Disabled text contrast (4.5:1 on white) */
+  --text-inactive: #5e5a5a; /* Inactive tab text (4.5:1) */
 
   /* Semantic Neutral Colors for Light Mode */
   --neutral-50: #fcf7f7;
@@ -70,12 +70,12 @@
     --color-error: #bd413f;
 
     /* Accessibility Colors - Dark Mode */
-    --accent-accessible: #c9a559; /* Lighter gold for dark mode */
-    --secondary-accessible: #4a9ee1; /* Lighter blue for dark mode */
+    --accent-accessible: #ab8c4b; /* Lighter gold for dark mode (3:1 on light) */
+    --secondary-accessible: #3778ab; /* Darker blue for dark mode (4.5:1 with white) */
     --link-accessible: #f55a75; /* Brighter red for dark mode */
-    --money-decimal-accessible: #d4b875; /* Lighter gold */
-    --text-disabled: #8a8888; /* Lighter gray for dark disabled text */
-    --text-inactive: #9a9595; /* Light inactive tab text */
+    --money-decimal-accessible: #a28c59; /* Muted gold (matches light mode) */
+    --text-disabled: #757373; /* Disabled text contrast (4.5:1 on white) */
+    --text-inactive: #5e5a5a; /* Inactive tab text (4.5:1) */
 
     /* Semantic Neutral Colors for Dark Mode */
     --neutral-50: #f5ecec;
@@ -108,7 +108,7 @@ html[data-theme="light"] {
   /* Primary Colors */
   --color-primary: #b92846;
   --color-secondary: #1a83db;
-  --color-accent: #d9a514;
+  --color-accent: #b98c11;
 
   /* Interface Colors - Light Mode */
   --bg-app: #fcf7f7;
