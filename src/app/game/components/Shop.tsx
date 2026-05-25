@@ -46,7 +46,7 @@ export default function Shop({
         (u) => UPGRADE_TO_ITEM_MAP[u.id] && !itemImages.has(u.id),
       );
 
-      // Load all images in parallel instead of sequentially
+      // Cargar todas las imágenes en paralelo
       const promises = upgradesToLoad.map(async (upgrade) => {
         const pokeapiItemName = UPGRADE_TO_ITEM_MAP[upgrade.id];
         if (!pokeapiItemName) return null;

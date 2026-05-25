@@ -1,10 +1,7 @@
-/**
- * PokeAPI Service
- * Fetches Pokémon data from the official PokeAPI
- */
+// Obtener datos de Pokémon desde PokeAPI
 
 const POKEAPI_BASE_URL = "https://pokeapi.co/api/v2";
-const POKEMON_CACHE_DURATION = 3600000; // 1 hour in milliseconds
+const POKEMON_CACHE_DURATION = 3600000; // 1 hora en milisegundos
 const cache = new Map<string, { data: unknown; timestamp: number }>();
 
 export interface Pokemon {
@@ -39,25 +36,20 @@ export interface Item {
   description: string;
 }
 
-/**
- * Get a random Pokémon
- * Returns a Pokémon with ID between 1 and 1025
- */
+// Devuelve un Pokémon al azar (entre 1 y 1025)
 export async function getRandomPokemon(): Promise<Pokemon> {
   const randomId = Math.floor(Math.random() * 1025) + 1;
   return getPokemonById(randomId);
 }
 
-/**
- * Get Pokémon by ID or name
- */
+// Busca un Pokémon por ID o nombre
 export async function getPokemonById(
   idOrName: number | string,
 ): Promise<Pokemon> {
   try {
     const cacheKey = `pokemon_${idOrName}`;
 
-    // Check cache
+    // Ver si ya lo tenemos en caché
     const cached = cache.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < POKEMON_CACHE_DURATION) {
       return cached.data as Pokemon;
@@ -105,7 +97,7 @@ export async function getPokemonById(
       },
     };
 
-    // Cache the result
+    // Guardar en caché
     cache.set(cacheKey, { data: pokemon, timestamp: Date.now() });
 
     return pokemon;
@@ -124,7 +116,7 @@ export async function getPokemonSpecies(
   try {
     const cacheKey = `species_${idOrName}`;
 
-    // Check cache
+    // Ver si ya lo tenemos en caché
     const cached = cache.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < POKEMON_CACHE_DURATION) {
       return cached.data as PokemonSpecies;
@@ -149,7 +141,7 @@ export async function getPokemonSpecies(
       isMythical: data.is_mythical,
     };
 
-    // Cache the result
+    // Guardar en caché
     cache.set(cacheKey, { data: species, timestamp: Date.now() });
 
     return species;
@@ -171,7 +163,7 @@ export async function determinePokemonRarity(
     if (species.isMythical) return "legendary";
     if (species.isLegendary) return "epic";
 
-    // Random chance for common/epic
+    // Probabilidad aleatoria para común/épico
     return Math.random() > 0.8 ? "epic" : "common";
   } catch {
     return "common";

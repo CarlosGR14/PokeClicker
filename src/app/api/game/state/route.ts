@@ -97,8 +97,8 @@ export async function GET() {
       cps: calculatedCps,
       upgrades,
       collectedPokemon: (() => {
-        // Consolidate Pokemon by pokeapi_id to prevent duplicates
-        // Group all records with same pokeapi_id and sum their quantities
+        // Agrupar Pokémon por pokeapi_id para evitar duplicados
+        // Sumar cantidades de todos los registros del mismo Pokémon
         const consolidatedMap = new Map<
           number,
           {
@@ -111,13 +111,13 @@ export async function GET() {
         for (const pokemon of usuario.pokemons) {
           const existing = consolidatedMap.get(pokemon.pokeapi_id);
           if (existing) {
-            // Sum quantities from all records with same pokeapi_id
+            // Sumar cantidades de todos los registros del mismo pokeapi_id
             existing.totalQuantidad += pokemon.cantidad || 1;
-            // Keep slot from first record that has one (don't overwrite)
+            // Mantener slot del primer registro que lo tenga (no sobrescribir)
             if (existing.indiceSlot === null && pokemon.indiceSlot !== null) {
               existing.indiceSlot = pokemon.indiceSlot;
             }
-            // Keep latest record for metadata
+            // Guardar el registro más reciente para metadatos
             if (pokemon.fecha_captura > existing.latestRecord.fecha_captura) {
               existing.latestRecord = pokemon;
             }
@@ -130,16 +130,16 @@ export async function GET() {
           }
         }
 
-        // Convert consolidated map to Pokemon array
+        // Convertir consolidated map a array de Pokemon
         return Array.from(consolidatedMap.entries()).map(
           ([pokeapi_id, data]) => ({
-            id: `${pokeapi_id}`, // Use pokeapi_id as the unique identifier
+            id: `${pokeapi_id}`, // Usar pokeapi_id como identificador único
             name: "", // Se llena en frontend con PokeAPI
             image: "", // Se llena en frontend con PokeAPI
             rarity:
               (data.latestRecord.rarity as "common" | "epic" | "legendary") ||
               "common",
-            cantidad: data.totalQuantidad, // Use summed quantity
+            cantidad: data.totalQuantidad, // Usar cantidad sumada
             indiceSlot: data.indiceSlot,
             expuesto:
               data.indiceSlot !== null &&

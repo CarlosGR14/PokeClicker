@@ -15,9 +15,7 @@ export const RATE_LIMIT_CONFIGS = {
   DEFAULT: { maxRequests: 100, windowMs: 60 * 1000 }, // Default: 100 requests per minute
 };
 
-/**
- * Obtener identificador del request (IP)
- */
+// Extraer IP del request (desde headers o usar 'unknown')
 export function getIdentifier(req: NextRequest): string {
   return (
     req.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
@@ -27,12 +25,7 @@ export function getIdentifier(req: NextRequest): string {
   );
 }
 
-/**
- * Middleware de rate limiting genérico
- * @param maxRequests - Máximo de requests permitidos
- * @param windowMs - Ventana de tiempo en milliseconds
- * @param getKeyFn - Función para obtener la clave (por defecto usa IP)
- */
+// Middleware para limitar requests por IP y ventana de tiempo
 export function rateLimitMiddleware(
   maxRequests: number = 100,
   windowMs: number = 60000, // 1 minute
@@ -71,10 +64,9 @@ export function rateLimitMiddleware(
         );
       }
 
-      // Incrementar contador
+      // Incrementar contador y llamar al handler
       rateLimitStore[key].count++;
 
-      // Call the handler
       return handler(req);
     };
   };

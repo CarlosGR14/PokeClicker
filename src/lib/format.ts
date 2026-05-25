@@ -1,7 +1,4 @@
-/**
- * Format a number with thousands separators
- * Consistent across server and client to avoid hydration mismatches
- */
+// Formatea dinero con separadores de miles - funciona igual en servidor y cliente
 export function formatMoney(value: number): string {
   return Math.floor(value)
     .toString()

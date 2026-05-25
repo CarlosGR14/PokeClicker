@@ -6,7 +6,7 @@ export default withAuth(
     const token = req.nextauth.token;
     const pathname = req.nextUrl.pathname;
 
-    // Role-based routing
+    // Enrutamiento según el rol del usuario
     if (pathname.startsWith("/admin")) {
       if (token?.role !== "admin") {
         return NextResponse.redirect(new URL("/auth/login", req.url));

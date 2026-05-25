@@ -464,7 +464,7 @@
 }
 
 .link {
-  color: #b92846;
+  color: var(--link-accessible);
   font-weight: 600;
   transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1);
   text-decoration: none;
@@ -472,8 +472,8 @@
 }
 
 .link:hover {
-  color: #c4334f;
-  border-bottom-color: #b92846;
+  color: #d62d4a;
+  border-bottom-color: var(--link-accessible);
 }
 
 .link:focus {

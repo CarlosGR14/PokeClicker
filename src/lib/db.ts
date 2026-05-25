@@ -4,7 +4,7 @@ import { PrismaClient } from "../../prisma/generated/client";
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
-// Parse DATABASE_URL to extract connection parameters
+// Extraer los parámetros de conexión de la URL
 const parseConnectionUrl = (url: string) => {
   // Format: mysql://user:password@host:port/database
   const regex = /mysql:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)/;

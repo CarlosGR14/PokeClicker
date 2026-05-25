@@ -211,7 +211,7 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      // CONSOLIDATE: Group by pokeapi_id and merge quantities
+      // Agrupar por pokeapi_id para unificar cantidades
       const consolidatedMap = new Map<
         number,
         {
@@ -233,11 +233,11 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // DELETE duplicates: for each pokeapi_id with multiple records, keep only the first
+      // Eliminar duplicados: mantener solo el primer registro de cada pokeapi_id
       const deleteDuplicatePromises = [];
       for (const [, { records }] of consolidatedMap.entries()) {
         if (records.length > 1) {
-          // Delete all except the first one
+          // Eliminar todos excepto el primero
           const toDelete = records.slice(1);
           for (const pokemon of toDelete) {
             deleteDuplicatePromises.push(
@@ -254,7 +254,7 @@ export async function POST(request: NextRequest) {
         await Promise.all(deleteDuplicatePromises);
       }
 
-      // Now get the clean single record for each pokeapi_id
+      // Obtener el registro único y limpio para cada pokeapi_id
       const existingPokemon = await prisma.pokemon.findMany({
         where: {
           usuario_id: usuario.id,
@@ -269,7 +269,7 @@ export async function POST(request: NextRequest) {
       // Preparar operaciones de upsert
       const upsertPromises = gameState.collectedPokemon
         .map((pokemon: any) => {
-          // Extract pokemonId from format "pokemonId_timestamp" (new capture) or solo "pokemonId" (from DB)
+          // Extraer pokemonId del formato "pokemonId_timestamp" (nuevas capturas) o solo "pokemonId" (de BD)
           const match = pokemon.id.match(/^(\d+)(?:_(\d+))?$/);
 
           if (!match) {
@@ -282,12 +282,12 @@ export async function POST(request: NextRequest) {
           const isNew = !!timestamp; // is new if has timestamp
 
           if (existingMap.has(pokeapiId)) {
-            // Update: set exact quantity from client (client has consolidated state)
+            // Actualizar: establecer cantidad exacta del cliente (tiene estado consolidado)
             const existingRecord = existingMap.get(pokeapiId)!;
             const data: any = {
               indiceSlot: pokemon.indiceSlot ?? null,
-              cantidad: pokemon.cantidad, // Use exact amount from client
-              rarity: pokemon.rarity ?? "common", // Save rarity to DB
+              cantidad: pokemon.cantidad, // Usar cantidad exacta del cliente
+              rarity: pokemon.rarity ?? "common", // Guardar rareza en BD
             };
 
             return prisma.pokemon.update({
@@ -295,7 +295,7 @@ export async function POST(request: NextRequest) {
               data,
             });
           } else {
-            // Create (only if NEW, is a new capture)
+            // Crear (solo si es NUEVO, captura nueva)
             if (!isNew) {
               console.warn(
                 `Pokemon ${pokeapiId} no existe y no es nuevo, ignorando`,
@@ -307,7 +307,7 @@ export async function POST(request: NextRequest) {
               data: {
                 usuario_id: usuario.id,
                 pokeapi_id: pokeapiId,
-                cantidad: pokemon.cantidad, // Use exact quantity from client
+                cantidad: pokemon.cantidad, // Usar cantidad exacta del cliente
                 indiceSlot: pokemon.indiceSlot ?? null,
                 rarity: pokemon.rarity ?? "common", // Save rarity when creating
               },

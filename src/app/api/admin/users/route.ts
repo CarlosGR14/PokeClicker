@@ -141,7 +141,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Prevent deleting yourself
+    // Evitar que se elimine a sí mismo
     if (admin.id === parseInt(id)) {
       return NextResponse.json(
         { error: "No puedes eliminar tu propia cuenta" },

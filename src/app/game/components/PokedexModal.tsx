@@ -17,10 +17,22 @@ export default function PokedexModal({ open, pokemon, onClose }: Props) {
   };
 
   return (
-    <div className={styles.pokedexBackdrop} onClick={handleClose}>
-      <div className={styles.pokedexModal} onClick={(e) => e.stopPropagation()}>
+    <div
+      className={styles.pokedexBackdrop}
+      onClick={handleClose}
+      role="presentation"
+    >
+      <div
+        className={styles.pokedexModal}
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="pokedex-title"
+      >
         <header className={styles.pokedexModalHeader}>
-          <h2 className={styles.pokedexModalTitle}>Pokédex</h2>
+          <h2 className={styles.pokedexModalTitle} id="pokedex-title">
+            Pokédex
+          </h2>
           <button
             className={styles.pokedexModalClose}
             onClick={handleClose}

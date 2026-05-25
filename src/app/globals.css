@@ -8,12 +8,20 @@
   --bg-app: #fcf7f7;
   --bg-card: #ffffff;
   --text-main: #1a1414;
-  --text-muted: #696161;
+  --text-muted: #4a3f3f;
 
   /* State Colors */
   --color-success: #5da260; /* Green */
   --color-disabled: #ab9a99;
   --color-error: #b32228; /* Red */
+
+  /* Accessibility Colors - WCAG AA Compliant */
+  --accent-accessible: #af8510; /* Muted yellow for contrast */
+  --secondary-accessible: #1675c5; /* Darker blue for contrast */
+  --link-accessible: #ea3256; /* Brighter red for link contrast */
+  --money-decimal-accessible: #ae9244; /* Muted gold */
+  --text-disabled: #737272; /* Disabled text contrast */
+  --text-inactive: #5f5a5a; /* Inactive tab text */
 
   /* Semantic Neutral Colors for Light Mode */
   --neutral-50: #fcf7f7;
@@ -24,17 +32,9 @@
   --neutral-900: #0d0a0a;
 
   /* Pack Card Colors - Light Mode */
-  --pack-basic-bg: linear-gradient(
-    140deg,
-    #eef9ee 0%,
-    #e8f1ec 100%
-  );
+  --pack-basic-bg: linear-gradient(140deg, #eef9ee 0%, #e8f1ec 100%);
   --pack-basic-border: #88c28a;
-  --pack-epic-bg: linear-gradient(
-    140deg,
-    #f6f3ff 0%,
-    #f3eafe 100%
-  );
+  --pack-epic-bg: linear-gradient(140deg, #f6f3ff 0%, #f3eafe 100%);
   --pack-epic-border: #9b7be9;
 
   /* Spacing */
@@ -62,12 +62,20 @@
     --bg-app: #070505;
     --bg-card: #151010;
     --text-main: #f5ecec;
-    --text-muted: #958d8d;
+    --text-muted: #a99999;
 
     /* State Colors - Dark adjusted */
     --color-success: #76af77;
     --color-disabled: #443736;
     --color-error: #bd413f;
+
+    /* Accessibility Colors - Dark Mode */
+    --accent-accessible: #c9a559; /* Lighter gold for dark mode */
+    --secondary-accessible: #4a9ee1; /* Lighter blue for dark mode */
+    --link-accessible: #f55a75; /* Brighter red for dark mode */
+    --money-decimal-accessible: #d4b875; /* Lighter gold */
+    --text-disabled: #8a8888; /* Lighter gray for dark disabled text */
+    --text-inactive: #9a9595; /* Light inactive tab text */
 
     /* Semantic Neutral Colors for Dark Mode */
     --neutral-50: #f5ecec;
@@ -78,17 +86,9 @@
     --neutral-900: #070505;
 
     /* Pack Card Colors - Dark Mode */
-    --pack-basic-bg: linear-gradient(
-      140deg,
-      #242b24 0%,
-      #1a211e 100%
-    );
+    --pack-basic-bg: linear-gradient(140deg, #242b24 0%, #1a211e 100%);
     --pack-basic-border: #2f5831;
-    --pack-epic-bg: linear-gradient(
-      140deg,
-      #33313b 0%,
-      #27212e 100%
-    );
+    --pack-epic-bg: linear-gradient(140deg, #33313b 0%, #27212e 100%);
     --pack-epic-border: #6549a3;
   }
 }
@@ -130,17 +130,9 @@ html[data-theme="light"] {
   --neutral-900: #0d0a0a;
 
   /* Pack Card Colors - Light Mode */
-  --pack-basic-bg: linear-gradient(
-    140deg,
-    #eef9ee 0%,
-    #e8f1ec 100%
-  );
+  --pack-basic-bg: linear-gradient(140deg, #eef9ee 0%, #e8f1ec 100%);
   --pack-basic-border: #88c28a;
-  --pack-epic-bg: linear-gradient(
-    140deg,
-    #f6f3ff 0%,
-    #f3eafe 100%
-  );
+  --pack-epic-bg: linear-gradient(140deg, #f6f3ff 0%, #f3eafe 100%);
   --pack-epic-border: #9b7be9;
 }
 
@@ -156,11 +148,7 @@ html[data-theme="dark"] {
   --bg-app: #070505;
   --bg-card: #151010;
   --text-main: #f5ecec;
-  --text-muted: #958d8d;
-
-  /* State Colors - Dark adjusted */
-  --color-success: #76af77;
-  --color-disabled: #443736;
+  --text-muted: #b9afaf;
   --color-error: #bd413f;
 
   /* Semantic Neutral Colors for Dark Mode */
@@ -172,17 +160,9 @@ html[data-theme="dark"] {
   --neutral-900: #070505;
 
   /* Pack Card Colors - Dark Mode */
-  --pack-basic-bg: linear-gradient(
-    140deg,
-    #242b24 0%,
-    #1a211e 100%
-  );
+  --pack-basic-bg: linear-gradient(140deg, #242b24 0%, #1a211e 100%);
   --pack-basic-border: #2f5831;
-  --pack-epic-bg: linear-gradient(
-    140deg,
-    #33313b 0%,
-    #27212e 100%
-  );
+  --pack-epic-bg: linear-gradient(140deg, #33313b 0%, #27212e 100%);
   --pack-epic-border: #6549a3;
 }
 

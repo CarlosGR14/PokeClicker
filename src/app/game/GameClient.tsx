@@ -27,9 +27,9 @@ import SettingsModal from "./components/SettingsModal";
 
 // ============ CONSTANTS ============
 const MIN_TIME_BETWEEN_SAVES = 2000; // 2 seconds
-const SAVE_DELAY_NORMAL = 5000; // 5 seconds for normal saves
-const SAVE_DELAY_IMPORTANT = 1000; // 1000ms for important saves (consolidate events)
-const SAVE_DELAY_CRITICAL = 200; // 200ms for critical saves (Pokémon captures, money loss)
+const SAVE_DELAY_NORMAL = 5000; // Guardar cada 5 segundos (cambios normales)
+const SAVE_DELAY_IMPORTANT = 1000; // Guardar en 1 segundo (cambios importantes)
+const SAVE_DELAY_CRITICAL = 200; // Guardar en 200ms (capturas, pérdida de dinero)
 
 function getDefaultGameState(): GameState {
   return {
@@ -42,7 +42,7 @@ function getDefaultGameState(): GameState {
 }
 
 export default function GameClient() {
-  // Safe to read localStorage here — SSR is disabled for this component
+  // Solo lectura directa de localStorage (SSR deshabilitado)
   const { data: session } = useSession();
   const [gameState, setGameState] = useState<GameState>(getDefaultGameState);
   const [isSavePending, setIsSavePending] = useState(false);
@@ -105,17 +105,17 @@ export default function GameClient() {
     localStorage.setItem("pokeclicker_theme", newTheme);
   };
 
-  // Load game state from BD on mount
+  // Cargar estado del juego cuando monta el componente
   useEffect(() => {
     const loadGameFromDB = async () => {
       try {
-        // Initialize Pokemon pool from PokeAPI (in background) and load game data
+        // Cargar lista de Pokémon y datos del juego en paralelo
         await Promise.all([
-          initializePokemonPool(), // Load dynamic Pokemon classifications in parallel
+          initializePokemonPool(), // Cargar clasificaciones de Pokémon
           fetch("/api/game/state", { credentials: "include" }),
           fetch("/api/game/prices", { credentials: "include" }),
         ]).then(async (results) => {
-          // Extract responses (skip the pool initialization which is undefined)
+          // Ignoramos el resultado del pool y usamos las otras respuestas
           const [, gameResponse, pricesResponse] = results as unknown as [
             unknown,
             Response,
@@ -148,25 +148,25 @@ export default function GameClient() {
           setPriceBaseMap(priceMap);
           setPricingConfig(pricesData.config);
 
-          // Update pack prices from DB
+          // Actualizar precios de los paquetes desde BD
           const updatedPacks = PACKS.map((pack) => ({
             ...pack,
             cost: priceMap[pack.name] || pack.cost,
           }));
           setPacksData(updatedPacks);
 
-          // Merge BD upgrades with INITIAL_UPGRADES to ensure all upgrades are present
+          // Combinar mejoras de BD con las iniciales para tenerlas todas
           const mergedUpgrades = INITIAL_UPGRADES.map((initialUpgrade) => {
             const dbUpgrade = data.upgrades?.find(
               (u) => u.id === initialUpgrade.id,
             );
 
-            // Use existing DB upgrade or create a new one with updated price from DB
+            // Si existe en BD, usarla; si no, crear con precio de BD
             if (dbUpgrade) {
               return dbUpgrade;
             }
 
-            // For new upgrades, use the price from DB if available
+            // Si la mejora es nueva, usar el precio de BD si existe
             const priceFromDB = priceMap[initialUpgrade.name];
             return {
               ...initialUpgrade,
@@ -174,7 +174,7 @@ export default function GameClient() {
             };
           });
 
-          // Fill Pokemon details from PokeAPI
+          // Completar nombre e imagen de Pokémon desde PokeAPI si faltan
           const filledPokemon = await Promise.all(
             data.collectedPokemon.map(async (pokemon) => {
               if (pokemon.name && pokemon.image) return pokemon;
@@ -202,7 +202,7 @@ export default function GameClient() {
           // 1. Pre-warm Gen I Pokémon (most common)
           preWarmGen1Cache();
 
-          // 2. Warm the user's collected Pokémon
+          // Precalentar Pokémon capturados del usuario
           const userPokemonIds = filledPokemon.map((p) => p.pokeapi_id || 0);
           if (userPokemonIds.length > 0) {
             warmRarityCache(userPokemonIds);
@@ -210,7 +210,7 @@ export default function GameClient() {
         });
       } catch (error) {
         console.error("Error loading game state:", error);
-        // Fallback to default state
+        // Volver al estado por defecto
         setGameState(getDefaultGameState());
       }
     };
@@ -225,7 +225,7 @@ export default function GameClient() {
     applyTheme(theme);
   }, [theme]);
 
-  // Refresh prices every 5 seconds to reflect admin changes
+  // Actualizar precios cada 5 segundos (cambios del admin)
   useEffect(() => {
     const refreshPrices = async () => {
       try {
@@ -243,7 +243,7 @@ export default function GameClient() {
           setPriceBaseMap(newPriceMap);
           setPricingConfig(pricesData.config);
 
-          // Update pack prices from DB
+          // Actualizar precios de los paquetes desde BD
           const updatedPacks = PACKS.map((pack) => ({
             ...pack,
             cost: newPriceMap[pack.name] || pack.cost,
@@ -259,16 +259,16 @@ export default function GameClient() {
     return () => clearInterval(interval);
   }, []);
 
-  // Save game state to BD - with cooldown and importance checking
-  // FIX: Usa isSavingRef para prevenir concurrent saves (race condition)
+  // Guardar estado del juego (con cooldown y validaciones)
+  // Usar isSavingRef para prevenir guardados concurrentes
   const scheduleGameSave = useCallback(
     (urgency: "normal" | "important" | "critical" = "important") => {
-      // Clear existing timeout if any
+      // Cancelar timeout anterior si existe
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
       }
 
-      // CRITICAL FIX: No guardar si ya hay una guardada
+      // No guardar si ya hay un guardado en progreso
       if (isSavingRef.current) {
         return;
       }
@@ -276,12 +276,12 @@ export default function GameClient() {
       const now = Date.now();
       const timeSinceLastSave = now - lastSaveRef.current;
 
-      // If we don't need to save and haven't waited long enough, skip
+      // Saltar si no es urgente y no ha pasado suficiente tiempo
       if (urgency === "normal" && timeSinceLastSave < MIN_TIME_BETWEEN_SAVES) {
         return;
       }
 
-      // Calculate delay based on urgency level
+      // El delay depende de qué tan urgente es guardar
       let delay: number;
       if (urgency === "critical") {
         delay = SAVE_DELAY_CRITICAL;
@@ -295,7 +295,7 @@ export default function GameClient() {
       saveTimeoutRef.current = setTimeout(async () => {
         isSavingRef.current = true;
         try {
-          // Validate data before sending
+          // Validar que los datos sean válidos antes de guardar
           if (gameState.money < 0) {
             console.warn("Invalid money value detected, rejecting save");
             return;
@@ -317,7 +317,7 @@ export default function GameClient() {
           });
 
           if (response.status === 401) {
-            // Session expired
+            // Sesión expirada, redirigir a login
             console.error("Session expired, redirecting to login");
             window.location.href = "/auth/login";
             return;
@@ -342,7 +342,7 @@ export default function GameClient() {
     [gameState],
   );
 
-  // Force immediate save (called by manual save button)
+  // Guardar inmediatamente (botón manual de guardado)
   const forceGameSave = useCallback(() => {
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
@@ -351,7 +351,7 @@ export default function GameClient() {
     setIsSavePending(true);
     saveTimeoutRef.current = setTimeout(async () => {
       try {
-        // Validate data before sending
+        // Validar que los datos sean válidos antes de guardar
         if (gameState.money < 0) {
           console.warn("Invalid money value detected, rejecting save");
           return;
@@ -390,10 +390,10 @@ export default function GameClient() {
         console.error("Error saving game state:", error);
         setIsSavePending(false);
       }
-    }, 100); // Minimal delay for manual saves
+    }, 100); // Retraso mínimo para guardados manuales
   }, [gameState]);
 
-  // Passive income - optimized with requestAnimationFrame
+  // Ganancia pasiva optimizada con requestAnimationFrame
   useEffect(() => {
     if (gameState.cps === 0) return;
     let lastTime = Date.now();
@@ -430,7 +430,7 @@ export default function GameClient() {
       setClickEffect({ x, y, id: Math.random().toString() });
       setTimeout(() => setClickEffect(null), 700);
 
-      // Calcular total click damage (1 + bonus from upgrades)
+      // Calcular daño total por clic (base 1 + bonus de mejoras)
       const totalClickBonus = gameState.upgrades
         .filter((u) => u.count > 0 && (u.clickBonus || 0) > 0)
         .reduce((sum, u) => sum + (u.clickBonus || 0) * u.count, 0);
@@ -487,7 +487,7 @@ export default function GameClient() {
           setPriceBaseMap(newPriceMap);
           setPricingConfig(pricesData.config);
 
-          // Update pack prices from DB
+          // Actualizar precios de los paquetes desde BD
           const updatedPacks = PACKS.map((pack) => ({
             ...pack,
             cost: newPriceMap[pack.name] || pack.cost,
@@ -600,14 +600,14 @@ export default function GameClient() {
   };
 
   const handleDisplaySlotSelect = (slot: number, pokemon: CollectedPokemon) => {
-    // Update gameState to reflect the new position
+    // Actualizar el estado para reflejar la nueva posición
     setGameState((prev) => {
       const updated = prev.collectedPokemon.map((p) => {
-        // Clear indiceSlot from any pokemon currently in this slot
+        // Limpiar indiceSlot de cualquier Pokémon que esté en este slot
         if (p.indiceSlot === slot) {
           return { ...p, indiceSlot: null };
         }
-        // If this is the pokemon being assigned, set its indiceSlot
+        // Si es el Pokémon asignado, establecer su indiceSlot
         if (p.id === pokemon.id) {
           return { ...p, indiceSlot: slot };
         }
@@ -625,7 +625,7 @@ export default function GameClient() {
     scheduleGameSave("important");
   };
 
-  // Derive displayedPokemon from gameState instead of maintaining as state
+  // Derivar displayedPokemon del gameState en lugar de mantenerlo como state
   const displayedPokemon: (CollectedPokemon | null)[] = [
     null,
     null,

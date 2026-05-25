@@ -102,7 +102,8 @@ button:focus-visible {
 
 .moneyDecimal {
   font-size: 1.25rem;
-  opacity: 0.7;
+  opacity: 1;
+  color: var(--money-decimal-accessible);
 }
 
 .headerRight {
@@ -191,7 +192,7 @@ button:focus-visible {
   font-size: 1.5rem;
   font-weight: 700;
   font-family: var(--font-mono);
-  color: var(--color-accent);
+  color: var(--accent-accessible);
 }
 
 .pokemonCircle {
@@ -546,7 +547,7 @@ button:focus-visible {
 
 .pokedexBtn {
   padding: 12px 28px;
-  background-color: var(--color-secondary);
+  background-color: var(--secondary-accessible);
   color: white;
   border: none;
   border-radius: 12px;
@@ -1051,12 +1052,12 @@ button:focus-visible {
   border-radius: 8px;
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--text-muted);
+  color: var(--text-inactive);
   cursor: pointer;
   transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
   font-family: var(--font-main);
-  opacity: 0.6;
+  opacity: 1;
 }
 
 .shopTab:hover {
@@ -1108,7 +1109,21 @@ button:focus-visible {
 }
 
 .upgradeCardDisabled {
-  opacity: 0.45;
+  opacity: 1;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+.upgradeCardDisabled .upgradeName {
+  color: var(--text-disabled) !important;
+}
+
+.upgradeCardDisabled .upgradeDesc {
+  color: var(--text-disabled) !important;
+}
+
+.upgradeCardDisabled .upgradeIconBubble {
+  background: rgba(211, 211, 211, 0.6);
 }
 
 .upgradeCardDisabled:hover {

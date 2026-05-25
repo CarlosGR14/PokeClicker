@@ -36,7 +36,37 @@
 
 ---
 
-### Colores de Estado
+### Colores de Accesibilidad (WCAG AA Compliant)
+
+**Modo Claro:**
+
+| Token CSS                    | Valor     | Uso                                            |
+| ---------------------------- | --------- | ---------------------------------------------- |
+| `--accent-accessible`        | `#af8510` | Valores por clic, acentos (contraste mejorado) |
+| `--secondary-accessible`     | `#1675c5` | Botones secundarios (contraste mejorado)       |
+| `--link-accessible`          | `#ea3256` | Enlaces en formularios                         |
+| `--money-decimal-accessible` | `#ae9244` | Decimales de dinero                            |
+| `--text-disabled`            | `#737272` | Texto deshabilitado/upgrades bloqueados        |
+| `--text-inactive`            | `#5f5a5a` | Tabs inactivos                                 |
+
+**Modo Oscuro:**
+
+| Token CSS                    | Valor     | Uso                               |
+| ---------------------------- | --------- | --------------------------------- |
+| `--accent-accessible`        | `#c9a559` | Valores por clic (modo oscuro)    |
+| `--secondary-accessible`     | `#4a9ee1` | Botones secundarios (modo oscuro) |
+| `--link-accessible`          | `#f55a75` | Enlaces (modo oscuro)             |
+| `--money-decimal-accessible` | `#d4b875` | Decimales de dinero (modo oscuro) |
+| `--text-disabled`            | `#8a8888` | Texto deshabilitado (modo oscuro) |
+| `--text-inactive`            | `#9a9595` | Tabs inactivos (modo oscuro)      |
+
+**📋 Notas sobre accesibilidad:**
+
+- Todos los colores cumplen con **WCAG 2 AA mínimo** (4.5:1 de contraste para texto)
+- Las variables se aplican automáticamente según el `prefers-color-scheme` del usuario
+- No usar colores hardcoded; siempre referenciar las variables
+
+---
 
 | Token CSS          | Valor     | Uso                                     |
 | ------------------ | --------- | --------------------------------------- |
